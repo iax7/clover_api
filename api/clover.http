@@ -1,0 +1,188 @@
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+# https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html
+
+# https://docs.clover.com/reference#inventorygetitems-1
+
+@base_url = https://apisandbox.dev.clover.com/v3/merchants/{{merchant_id}}
+
+### merchant -------------------------------------------------------------------
+GET {{base_url}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+# Categories -------------------------------------------------------------------
+### get all
+GET {{base_url}}/categories
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+###
+POST {{base_url}}/categories
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "new category"
+}
+
+# Item Groups ------------------------------------------------------------------
+### get all
+GET {{base_url}}/item_groups?expand=items,attributes
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### new
+POST {{base_url}}/item_groups
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+// does not work to send items here, needs to be added
+// when creating an item
+{
+    "name": "iPhone 12"
+}
+
+//    "items": [
+//        { "id": "HC28W9N9Y1SFG" },
+//        { "id": "G6PBW1VVF7CQ4" },
+//        { "id": "65QPRWCXSM2XE" },
+//        { "id": "59HXFZCV9HA02" }
+//    ]
+//}
+
+# Attributes  ------------------------------------------------------------------
+### get all
+GET {{base_url}}/attributes?expand=options
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### create
+POST {{base_url}}/attributes?expand=options
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+// name and itemGroup required
+{
+  "name": "Color",
+  "itemGroup": {
+    "id": "NZV186DJ2W64T"
+  }
+}
+
+NZV186DJ2W64T
+ZAFJ1DNG6S8GM                  0789GXS58G004
+BQWQ38RS3N6WJ AQD4AHXT7XT54    5M08ERBZV84QA ECKY9W3RK7JTE
+
+B77Z86YXJWD2P item
+
+# Options  ---------------------------------------------------------------------
+### get all
+GET {{base_url}}/options
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### creeate
+@attribute_id = 0789GXS58G004
+POST {{base_url}}/attributes/{{attribute_id}}/options
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Gold"
+}
+
+# Items (Products) -------------------------------------------------------------
+### get all
+GET {{base_url}}/items?expand=categories,modifierGroups,itemStock,options
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### new
+POST {{base_url}}/items
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+// only name and price are required
+{
+    "hidden": false,
+    "itemGroup": {
+        "id": "NZV186DJ2W64T"
+    },
+    "defaultTaxRates": true,
+    "isRevenue": true,
+    "categories":[
+      {"id": "C8H9S0BNQDS1M"},
+      {"id": "Z0QSSR8Q8EJ5C"}
+    ],
+    "itemStock": {
+        "quantity": 9
+    },
+    "options": [
+      { "id": "ECKY9W3RK7JTE", "name": "Gold", "attribute": { "id": "0789GXS58G004" } }
+    ],
+    "name": "iphone?????",
+    "code": "IPHONE",
+    "sku": "IPHONE",
+    "price": 29999,
+    "priceType": "FIXED",
+    "unitName": "item"
+}
+
+### edit
+PUT {{base_url}}/items/HC28W9N9Y1SFG
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "itemStock": {
+        "quantity": 99
+    },
+    "name": "MacBook Air",
+    "code": "AIR1",
+    "sku": "AIR1-1",
+    "price": 9999
+}
+
+### delete ?itemIds=[itemId],[itemId],[itemId]
+DELETE {{base_url}}/items?itemIds=
+
+### modify multiple items
+# post create
+# put updates
+PUT {{base_url}}/bulk_items
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "items": [
+    { "id": "HC28W9N9Y1SFG", "name": "new", "price": 9, "itemStock":{"item":{"id": "HC28W9N9Y1SFG"},"quantity":12} },
+    { "id": "G6PBW1VVF7CQ4", "name": "new", "price": 9, "itemStock":{"item":{"id": "G6PBW1VVF7CQ4"},"quantity":12} }
+  ]
+}
+
+# item/option ------------------------------------------------------------------
+### create asociation
+POST {{base_url}}/option_items
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "option": { "id": "ECKY9W3RK7JTE" },
+  "item": { "id": "VTAHVMFDR63FT" }
+}
+
+# Inventory Levels -------------------------------------------------------------
+### get all
+GET {{base_url}}/item_stocks
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### update single
+POST {{base_url}}/item_stocks/HC28W9N9Y1SFG
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "quantity": 99.0
+}
+
