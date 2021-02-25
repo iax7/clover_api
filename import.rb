@@ -18,70 +18,130 @@ BASE_URLS = {
 
 BASE_URL = "https://#{BASE_URLS[:dev]}/v3/merchants/#{MERCHANT_ID}"
 
-def get_data(response)
-  # TODO: investigate pagination
-  hash = JSON.parse response.body, symbolize_names: true
-  puts response.env.url.to_s
-  hash[:elements]
-end
-
 headers = {
   'Content-Type' => 'application/json',
   'Accept' => 'application/json',
   'Authorization' => "Bearer #{TOKEN}"
 }.freeze
 
-client = Faraday.new(url: BASE_URL, headers: headers)
-rc = get_data client.get('categories')
-rp = get_data client.get('items', { 'expand' => 'categories,modifierGroups,itemStock,options' })
-rg = get_data client.get('item_groups', { 'expand' => 'items,attributes' })
+def get_method(endpoint, other_params = {})
+  # limit cannot be greater than 1000
+  params = {
+    limit: 1000,
+    offset: 0
+  }.merge(other_params)
+  result = []
+  (1...).each do |i|
+    puts "Fetching (#{endpoint}) #{i}"
+    res = @client.get(endpoint, params)
+    hash = JSON.parse(res.body, symbolize_names: true)
+    elements = hash[:elements]
+    result.concat(elements)
+    should_fetch_next = elements.size == params[:limit]
+    return result unless should_fetch_next
+
+    params[:offset] = params[:limit] + params[:offset]
+  end
+end
+
+@client = Faraday.new(url: BASE_URL, headers: headers)
 binding.pry
+rc = get_method('categories')
+rp = get_method('items', { expand: 'categories,itemStock,options', return_null_fields: true })
+rg = get_method('item_groups', { expand: 'attributes' })
+
+puts 'Digesting...'
+
+# Main product
+prd = rg.each_with_object({}) do |v, res|
+  data = { id: v[:id], name: v[:name], variants: [] }
+  # warning clover let you duplicate attributes name!
+  opts = v.dig(:attributes, :elements)&.map { _1[:name] }.uniq.map { { name: _1 } }
+  data[:options] = opts
+  res[v[:id]] = data
+end
+
+ig_idx = rg.each_with_object({}) {|v,res| res[v[:id]] = v }
+
+binding.pry
+
+# processing items to add as a new product or a variant
+rp.each do |var|
+  prd_id = var.dig(:itemGroup, :id)
+  id = var[:id]
+  cat = var.dig(:categories, :elements)&.map { _1[:id] }
+  name = var.dig(:options, :elements)&.first&.dig(:name)
+  inv = var.dig(:itemStock, :quantity)
+  new_var = {
+    id: id,
+    price: (var[:price].to_i / 100.0),
+    sku: var[:sku],
+    upc: var[:upc],
+    categories: cat,
+    inventory_level: inv,
+    option_values: { label: name, option_display_name: nil }
+  }
+  if new_var[:sku].nil?
+    puts "rejected #{name}, is missing SKU"
+    next
+  end
+  if prd_id # is a variant
+    parent = prd[prd_id]
+    parent[:inventory_tracking] = inv.nil? ? 'none' : "variant"
+    parent[:variants] << new_var
+  else # is a standalone product
+    new_var[:inventory_tracking] = inv.nil? ? 'none' : 'product'
+    prd[id] = new_var
+  end
+end
 
 puts 'done.'
 
-def product
-  # name, price REQUIRED
-  default = {
-    hidden: false,
-    priceType: 'FIXED',
-    defaultTaxRates: true,
-    isRevenue: true
+# Changes ----------------------------------------------------------------------
+def item_group(name)
+  data = {
+    name: name
   }
-  id = Time.now.to_i
-  default.merge(
-    {
-      name: "Product #{id}",
-      sku: "sku #{id}",
-      code: 'UPC',
-      price: 19.90,
-      categories: [
-        { id: 'Z0QSSR8Q8EJ5C' }
-      ],
-      item_group: [
-        id: '@#$@#$WERFEDASFSDF'
-      ]
-    }
-  )
+  client.post('item_groups', data.to_json)
 end
-client.post('items', product.to_json, { 'expand' => 'categories,modifierGroups,itemStock,options' })
+
+def attributes(item_group_id, name)
+  data = {
+    name: name,
+    itemGroup: {
+      id: item_group_id
+    }
+  }
+  client.post('attributes', data.to_json)
+end
+
+def options(name)
+  data = {
+    name: name
+  }
+  client.post("attributes/#{attribute_id}/options", data.to_json)
+end
+
+def product(item_group_id = nil)
+  id = Time.now.to_i
+  ig = [
+    id: item_group_id
+  ]
+  # name, price REQUIRED
+  prd = {
+    name: "Product #{id}",
+    sku: "sku #{id}",
+    code: 'UPC',
+    price: 1990
+  }
+  prd[:itemGroup] = ig if item_group_id
+  client.post('items', prd.to_json, { 'expand' => 'categories,modifierGroups,itemStock,options' })
+end
 
 def category
   # name REQUIRED
-  {
+  data = {
     name: "Category #{Time.now.to_i}"
   }
+  client.post('categories', data.to_json)
 end
-client.post('categories', category.to_json)
-
-def item_group
-  {
-    name: 'MacBook Pro NEW',
-    items: [
-      { id: 'HC28W9N9Y1SFG' },
-      { id: 'G6PBW1VVF7CQ4' },
-      { id: '65QPRWCXSM2XE' },
-      { id: '59HXFZCV9HA02' }
-    ]
-  }
-end
-client.post('item_groups', item_group.to_json)
