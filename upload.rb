@@ -68,7 +68,6 @@ def attributes(item_group_id, name)
 
 products["products"].each do |i|
     it = result item_group(i["name"])
-
     attr = []
     i["attributes"].each do |a|
         attr << result(attributes(it[:id],a))
@@ -77,9 +76,15 @@ products["products"].each do |i|
     opt = []
     i["options"].each do |k,v|
         v.each do |o|
-            binding.pry
             attr_id = attr.find {|a|a[:name]==k}[:id]
             opt << result(options(attr_id,o))
         end
     end
+
+    vars = []
+    i["variants"].each do |var|
+        binding.pry
+        vars << result(product(it[:id],var["name"],var["sku"],var["price"]))
+    end
+
 end
