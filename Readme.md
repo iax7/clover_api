@@ -6,16 +6,16 @@ cp .env.template .env
 ./import.rb
 ```
 
-configure http client:
+configure http client in VS Code:
 
 ```json
-    "rest-client.environmentVariables": {
-        "$shared": {
-            "version": "v3"
-        },
-        "clover": {
-            "merchant_id": "",
-            "token": ""
-        },
-      }
+"rest-client.environmentVariables": {
+    "$shared": {
+        "version": "v3"
+    },
+    "clover": {
+        "merchant_id": "",
+        "token": ""
+    },
+}
 ```
