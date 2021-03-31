@@ -1,8 +1,17 @@
 # products with Variants yml
+# global categories
+categories:
+  - Phones
+  - Cars
+  - Laptops
+  - Extra Category
 
 #Phones:
 products:
   - name: iPhone
+    categories:
+      - Phones
+      - Extra Category
     attributes:
       - color
       - size
@@ -15,17 +24,21 @@ products:
         - white
     variants:
       - name: iPhone Red 32G
-        sku: 32G-RED
+        sku: iphone-32G-RED
         price: 3232
+        stock: 10
       - name: iPhone Red 64G
-        sku: 64G-RED
+        sku: iphone-64G-RED
         price: 3232
+        stock: 20
       - name: iPhone White 32G
-        sku: 32G-WHITHE
+        sku: iphone-32G-WHITHE
         price: 3232
+        stock: 30
       - name: iPhone White 64G
-        sku: 56G-WHITE
+        sku: iphone-64G-WHITE
         price: 3232
+        stock: 10
 
   - name: Galaxy
     attributes:
@@ -40,16 +53,16 @@ products:
         - white
     variants:
       - name: Galaxy Red 32G
-        sku: 32G-RED
+        sku: galaxy-32G-RED
         price: 3232
       - name: Galaxy Red 64G
-        sku: 64G-RED
+        sku: galaxy-64G-RED
         price: 3232
       - name: Galaxy White 32G
-        sku: 32G-WHITHE
+        sku: galaxy-32G-WHITHE
         price: 3232
       - name: Galaxy White 64G
-        sku: 56G-WHITE
+        sku: galaxy-56G-WHITE
         price: 3232
 
   - name: Motorola
@@ -65,16 +78,16 @@ products:
         - white
     variants:
       - name: Motorola Red 32G
-        sku: 32G-RED
+        sku: motorola-32G-RED
         price: 3232
       - name: Motorola Red 64G
-        sku: 64G-RED
+        sku: motorola-64G-RED
         price: 3232
       - name: Motorola White 32G
-        sku: 32G-WHITHE
+        sku: motorola-32G-WHITHE
         price: 3232
       - name: Motorola White 64G
-        sku: 56G-WHITE
+        sku: motorola-64G-WHITE
         price: 3232
 
 #Cars:
@@ -91,16 +104,16 @@ products:
         - white
     variants:
       - name: Civic 1.5 Red
-        sku: 1.5-RED
+        sku: civic-1.5-RED
         price: 100000
       - name: Civic 1.5 White
-        sku: 1.5-WHITE
+        sku: civic-1.5-WHITE
         price: 100000
       - name: Civic 2.0 Red
-        sku: 2.0-RED
+        sku: civic-2.0-RED
         price: 100000
       - name: Civic 2.0 White
-        sku: 2.0-WHITE
+        sku: civic-2.0-WHITE
         price: 100000
 
   - name: Mazda
@@ -116,16 +129,16 @@ products:
         - white
     variants:
       - name: Mazda 1.5 Red
-        sku: 1.5-RED
+        sku: mazda-1.5-RED
         price: 100000
       - name: Mazda 1.5 White
-        sku: 1.5-WHITE
+        sku: mazda-1.5-WHITE
         price: 100000
       - name: Mazda 2.0 Red
-        sku: 2.0-RED
+        sku: mazda-2.0-RED
         price: 100000
       - name: Mazda 2.0 White
-        sku: 2.0-WHITE
+        sku: mazda-2.0-WHITE
         price: 100000
 
   - name: Corolla
@@ -141,16 +154,16 @@ products:
         - white
     variants:
       - name: Corolla 1.5 Red
-        sku: 1.5-RED
+        sku: corolla-1.5-RED
         price: 100000
       - name: Corolla 1.5 White
-        sku: 1.5-WHITE
+        sku: corolla-1.5-WHITE
         price: 100000
       - name: Corolla 2.0 Red
-        sku: 2.0-RED
+        sku: corolla-2.0-RED
         price: 100000
       - name: Corolla 2.0 White
-        sku: 2.0-WHITE
+        sku: corolla-2.0-WHITE
         price: 100000
 
 #Laptops:
@@ -167,16 +180,16 @@ products:
         - white
     variants:
       - name: Macbook Pro 13 - "Space"
-        sku: PRO-13"-SPACE
+        sku: macbookpro-13"-SPACE
         price: 7898
       - name: Macbook Pro 16 - "Space"
-        sku: PRO-16"-SPACE
+        sku: macbookpro-16"-SPACE
         price: 7898
       - name: Macbook Pro 13 - "White"
-        sku: PRO-13"-WHITE
+        sku: macbookpro-13"-WHITE
         price: 7898
       - name: Macbook Pro 16 - "White"
-        sku: PRO-16"-WHITE
+        sku: macbookpro-"-WHITE
         price: 7898
 
   - name: Macbook Air
@@ -192,16 +205,16 @@ products:
         - white
     variants:
       - name: Macbook Air 13 - "Space"
-        sku: PRO-13"-SPACE
+        sku: macbookair-13"-SPACE
         price: 7898
       - name: Macbook Air 16 - "Space"
-        sku: PRO-16"-SPACE
+        sku: macbookair-16"-SPACE
         price: 7898
       - name: Macbook Air 13 - "White"
-        sku: PRO-13"-WHITE
+        sku: macbookair-13"-WHITE
         price: 7898
       - name: Macbook Air 16 - "White"
-        sku: PRO-16"-WHITE
+        sku: macbookair-16"-WHITE
         price: 7898
 
   - name: Lenovo
@@ -217,14 +230,14 @@ products:
         - white
     variants:
       - name: Lenovo 13 - "Gray"
-        sku: PRO-13"-GRAY
+        sku: lenovo-13"-GRAY
         price: 9999
       - name: Lenovo 16 - "GRAY"
-        sku: PRO-16"-GRAY
+        sku: lenovo-16"-GRAY
         price: 9999
       - name: Lenovo Space 13 - "White"
-        sku: PRO-13"-WHITE
+        sku: lenovo-13"-WHITE
         price: 9999
       - name: Lenovo 16 - "White"
-        sku: PRO-16"-WHITE
+        sku: lenovo-16"-WHITE
         price: 9999
