@@ -6,7 +6,7 @@
 
 @prod_base = api.clover.com
 @dev_base = apisandbox.dev.clover.com
-@base_url = https://{{prod_base}}/v3/merchants/{{merchant_id}}
+@base_url = https://{{dev_base}}/v3/merchants/{{merchant_id}}
 
 ### merchant -------------------------------------------------------------------
 GET {{base_url}}
@@ -42,8 +42,7 @@ Authorization: Bearer {{token}}
 
 ### Deleting item associations
 POST {{base_url}}/category_items?delete=true
-Content-Type: appli
-cation/json
+Content-Type: application/json
 Authorization: Bearer {{token}}
 
 { "elements": [{"category":{"id":"categoryId"},"item":{"id":"itemId"}}] }
@@ -193,3 +192,34 @@ Authorization: Bearer {{token}}
   "quantity": 99.0
 }
 
+# Orders -----------------------------------------------------------------------
+### get
+GET {{base_url}}/orders
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### create
+POST {{base_url}}/atomic_order/orders
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "orderCart" : {
+    "title": "my order",
+    "currency": "USD",
+    "paymentState": "OPEN",
+          "state": "open",
+      "manualTransaction": false,
+    "lineItems": [
+      { "item": { "id": "JKCM679Q57TE6" } }
+    ],
+    "orderType" : {
+      "taxable" : false,
+      "isDefault" : false,
+      "filterCategories" : false,
+      "isHidden" : false,
+      "isDeleted" : false
+    },
+    "groupLineItems" : false
+  }
+}
