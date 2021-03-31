@@ -12,7 +12,7 @@ BASE_URLS = {
   prod: 'api.clover.com'
 }.freeze
 
-BASE_URL = "https://#{BASE_URLS[:dev]}/v3/merchants/#{MERCHANT_ID}"
+BASE_URL = "https://#{BASE_URLS[:prod]}/v3/merchants/#{MERCHANT_ID}"
 
 headers = {
   'Content-Type' => 'application/json',
@@ -21,8 +21,15 @@ headers = {
 }.freeze
 @client = Faraday.new(url: BASE_URL, headers: headers)
 
-products = YAML.load_file('products.yml')
+catalog = YAML.load_file('products.yml')
 # Changes ----------------------------------------------------------------------
+def category(name)
+  data = {
+    name: name
+  }
+  @client.post('categories', data.to_json)
+end
+
 def item_group(name)
   data = {
     name: name
@@ -118,7 +125,38 @@ def comb(a,b)
   end
 end
 
-products["products"].each do |i|
+#Categories
+def category_items(product_id,categories_idx,categories)
+  elements = []
+  categories.each_with_object(elements) do |name, res|
+    category_id = categories_idx[name]
+    res<<{ "category": { "id": category_id }, "item": { "id": product_id } }
+  end
+
+  itm_opt = {
+    "elements": elements
+  }
+  @client.post('category_items', itm_opt.to_json)
+end
+
+categories_idx = {}
+catalog["categories"].each do |cat_name|
+  puts "Creating Category: #{cat_name}"
+  cat = result category(cat_name)
+  categories_idx[cat[:name]]=cat[:id]
+end
+
+#Stock
+def stock(product_id,stock_count)
+
+    itm_opt = {
+      "quantity": stock_count
+    }
+    @client.post("item_stocks/#{product_id}", itm_opt.to_json)
+end
+
+#Products
+catalog["products"].each do |i|
   name = i["name"]
   puts "Creating #{name}"
   it = result item_group(name)
@@ -146,7 +184,11 @@ products["products"].each do |i|
     new_var = result(product(it[:id],var["name"],var["sku"],var["price"]))
     new_var[:_options] = combinations.shift
     vars << new_var
+
+    category_items(new_var[:id],categories_idx,i["categories"])
+    stock(new_var[:id],var["stock"])
   end
 
   option_item(vars)
+
 end
