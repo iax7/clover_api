@@ -19,7 +19,7 @@ GET {{base_url}}/categories?limit=4&offset=8
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
-###
+### create
 POST {{base_url}}/categories
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -27,6 +27,11 @@ Authorization: Bearer {{token}}
 {
   "name": "new category"
 }
+
+### delete
+DELETE  {{base_url}}/categories/7R79TGAP8BVHT
+Content-Type: application/json
+Authorization: Bearer {{token}}
 
 ### Associating items with a category
 POST {{base_url}}/category_items

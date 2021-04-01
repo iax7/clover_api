@@ -8,47 +8,16 @@ require 'faraday'
 require 'json'
 require 'pry'
 
+require_relative 'api/clover'
+
 MERCHANT_ID = ENV['MERCHANT_ID']
 TOKEN = ENV['TOKEN']
 
-BASE_URLS = {
-  dev: 'apisandbox.dev.clover.com',
-  prod: 'api.clover.com'
-}.freeze
+clover = Api::Clover.new(:dev, MERCHANT_ID, TOKEN)
 
-BASE_URL = "https://#{BASE_URLS[:dev]}/v3/merchants/#{MERCHANT_ID}"
-
-headers = {
-  'Content-Type' => 'application/json',
-  'Accept' => 'application/json',
-  'Authorization' => "Bearer #{TOKEN}"
-}.freeze
-
-def get_method(endpoint, other_params = {})
-  # limit cannot be greater than 1000
-  params = {
-    limit: 1000,
-    offset: 0
-  }.merge(other_params)
-  result = []
-  (1...).each do |i|
-    puts "Fetching (#{endpoint}) #{i}"
-    res = @client.get(endpoint, params)
-    hash = JSON.parse(res.body, symbolize_names: true)
-    elements = hash[:elements]
-    result.concat(elements)
-    should_fetch_next = elements.size == params[:limit]
-    return result unless should_fetch_next
-
-    params[:offset] = params[:limit] + params[:offset]
-  end
-end
-
-@client = Faraday.new(url: BASE_URL, headers: headers)
-binding.pry
-rc = get_method('categories')
-rp = get_method('items', { expand: 'categories,itemStock,options', return_null_fields: true })
-rg = get_method('item_groups', { expand: 'attributes' })
+rc = clover.get_method('categories')
+rp = clover.get_method('items', { expand: 'categories,itemStock,options', return_null_fields: true })
+rg = clover.get_method('item_groups', { expand: 'attributes' })
 
 puts 'Digesting...'
 
@@ -56,12 +25,12 @@ puts 'Digesting...'
 prd = rg.each_with_object({}) do |v, res|
   data = { id: v[:id], name: v[:name], variants: [] }
   # warning clover let you duplicate attributes name!
-  opts = v.dig(:attributes, :elements)&.map { _1[:name] }.uniq.map { { name: _1 } }
+  opts = v.dig(:attributes, :elements)&.map { _1[:name] }&.uniq&.map { { name: _1 } }
   data[:options] = opts
   res[v[:id]] = data
 end
 
-ig_idx = rg.each_with_object({}) {|v,res| res[v[:id]] = v }
+ig_idx = rg.each_with_object({}) { |v, res| res[v[:id]] = v }
 
 binding.pry
 
