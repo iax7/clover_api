@@ -45,6 +45,10 @@ module Api
       @client.post('item_groups', data.to_json)
     end
 
+    def item_group_delete(id)
+      @client.delete("item_groups/#{id}")
+    end
+
     def attributes_create(item_group_id, name)
       data = {
         name: name,
