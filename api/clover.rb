@@ -8,6 +8,9 @@ module Api
       prod: 'api.clover.com'
     }.freeze
 
+    # @param env [Symbol]
+    # @param merchant_id [String]
+    # @param token [String]
     # @return [self]
     def initialize(env, merchant_id, token)
       base_url = "https://#{BASE_URLS[env]}/v3/merchants/#{merchant_id}"
