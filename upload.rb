@@ -14,8 +14,11 @@ CLOVER_ENV = ENV.fetch('CLOVER_ENV', 'dev')
 MERCHANT_ID = ENV['MERCHANT_ID']
 TOKEN = ENV['TOKEN']
 
+CATALOG_FILE = ENV.fetch('CATALOG_FILE', 'upload_catalog.yml')
+
 clover = Api::Clover.new(CLOVER_ENV.to_sym, MERCHANT_ID, TOKEN)
-catalog = YAML.load_file('products.yml')
+puts "Loading catalog file: \e[33m#{CATALOG_FILE}\e[0m..."
+catalog = YAML.load_file(CATALOG_FILE)
 
 def result(res)
   JSON.parse(res.body, symbolize_names: true)
@@ -24,7 +27,7 @@ end
 Helpers::Helper.headline('Categories')
 categories_idx = {}
 catalog['categories'].each do |category_name|
-  puts "Creating Category: #{category_name}"
+  puts "Creating \e[33m#{category_name}\e[0m"
   new_category = result clover.category_create(category_name)
   categories_idx[new_category[:name]] = new_category[:id]
 end
@@ -32,7 +35,7 @@ end
 Helpers::Helper.headline('Products')
 catalog['products'].each do |product|
   name = product['name']
-  puts "Creating #{name}"
+  puts "Creating \e[33m#{name}\e[0m"
   item_group = result clover.item_group_create(name)
 
   attributes = []

@@ -5,7 +5,8 @@
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -30,3 +31,6 @@ Temporary Items
 .env
 .idea
 
+# Catalog
+*.yml
+!upload_catalog.yml

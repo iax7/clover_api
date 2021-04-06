@@ -1,0 +1,35 @@
+categories:
+  - Electronics
+  - Food
+
+products:
+  - name: iPhone 12
+    categories:
+      - Electronics
+    attributes:
+      - Color
+      - Size
+    options:
+      Size:
+        - 32G
+        - 64G
+      Color:
+        - Black
+        - White
+    variants:
+      - name: iPhone Black 32G
+        sku: IP-Black-32
+        price: 29900
+        stock: 10
+      - name: iPhone Black 64G
+        sku: IP-Black-64
+        price: 39900
+        stock: 20
+      - name: iPhone White 32G
+        sku: IP-White-32
+        price: 29900
+        stock: 30
+      - name: iPhone White 64G
+        sku: IP-White-64
+        price: 39900
+        stock: 10
