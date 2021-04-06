@@ -55,9 +55,9 @@ catalog['products'].each do |product|
   combinations = clover.attr_opt_combinations(ao_ids)
 
   vars = []
-  max_sku_name_size = product['variants'].map { _1['sku'].size }.max
+  max_sku_name_size = product['variants'].map { _1['sku']&.size }.compact.max
   product['variants'].each do |variant|
-    puts "  > creating variant: #{variant['sku'].ljust(max_sku_name_size)} | #{variant['name']}"
+    puts "  > creating variant: #{variant['sku']&.ljust(max_sku_name_size)} | #{variant['name']}"
     new_var = result(clover.product_create(item_group[:id], variant['name'], variant['sku'], variant['price']))
     new_var[:_options] = combinations.shift
     vars << new_var
