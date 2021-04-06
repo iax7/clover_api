@@ -13,6 +13,7 @@ module Api
     # @param token [String]
     # @return [self]
     def initialize(env, merchant_id, token)
+      raise ArgumentError, "CLOVER_ENV should be one of #{BASE_URLS.keys.inspect}" unless BASE_URLS.keys.include?(env)
       base_url = "https://#{BASE_URLS[env]}/v3/merchants/#{merchant_id}"
       @client = Faraday.new(url: base_url, headers: headers(token))
     end

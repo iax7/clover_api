@@ -10,10 +10,11 @@ require 'pry'
 require_relative 'api/clover'
 require_relative 'helpers/helper'
 
+CLOVER_ENV = ENV.fetch('CLOVER_ENV', 'dev')
 MERCHANT_ID = ENV['MERCHANT_ID']
 TOKEN = ENV['TOKEN']
 
-clover = Api::Clover.new(:dev, MERCHANT_ID, TOKEN)
+clover = Api::Clover.new(CLOVER_ENV.to_sym, MERCHANT_ID, TOKEN)
 catalog = YAML.load_file('products.yml')
 
 def result(res)
