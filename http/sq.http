@@ -1,0 +1,84 @@
+# https://developer.squareup.com/explorer/square
+
+@base = https://connect.squareup.com/v2
+@version = 2021-01-21
+
+# Locations --------------------------------------------------------------------
+### get
+GET {{base}}/locations
+Authorization: Bearer {{sq_token}}
+Content-Type: application/json
+Square-Version: {{version}}
+
+# Catalog ----------------------------------------------------------------------
+### get single
+GET {{base}}/catalog/object/6XUD4NKEP3L2WA3SAPEX3IHL
+Authorization: Bearer {{sq_token}}
+Content-Type: application/json
+Square-Version: {{version}}
+
+### get all
+GET {{base}}/catalog/list
+    ?types=ITEM,ITEM_VARIATION,CATEGORY,MODIFIER,IMAGE
+Authorization: Bearer {{sq_token}}
+Content-Type: application/json
+Square-Version: {{version}}
+
+### get all (with filtering)
+POST {{base}}/catalog/search
+Authorization: Bearer {{sq_token}}
+Content-Type: application/json
+Square-Version: {{version}}
+
+{
+    "object_types": [
+        "CATEGORY",
+        "ITEM",
+        "ITEM_VARIATION",
+        "IMAGE",
+        "MODIFIER"
+    ],
+    "limit": 1000
+}
+
+### delete
+DELETE {{base}}/catalog/object/6XUD4NKEP3L2WA3SAPEX3IHL
+Authorization: Bearer {{sq_token}}
+Content-Type: application/json
+Square-Version: {{version}}
+
+# Inventory --------------------------------------------------------------------
+### get counts
+POST {{base}}/inventory/batch-retrieve-counts
+Authorization: Bearer {{sq_token}}
+Content-Type: application/json
+Square-Version: {{version}}
+
+{
+    "catalog_object_ids": [],
+    "location_ids": ["{{sq_location_id}}"],
+    "updated_after": "2019-12-12T00:00:00.000Z"
+}
+
+### BATCH change counts
+POST {{base}}/inventory/batch-change
+Authorization: Bearer {{sq_token}}
+Content-Type: application/json
+Square-Version: {{version}}
+
+{
+    "idempotency_key": "3e5d5101-1add-4f41-a2fb-902dc4143528",
+    "changes": [
+        {
+            "type": "PHYSICAL_COUNT",
+            "physical_count": {
+                "catalog_object_id": "RJZNNJHTVZLJ2UKRHUJVOHAE",
+                "state": "IN_STOCK",
+                "location_id": "14M5ZJ0YT1BG1",
+                "quantity": "2",
+                "occurred_at": "2020-01-24T12:36:50.278Z"
+            }
+        }
+    ],
+    "ignore_unchanged_counts": true
+}

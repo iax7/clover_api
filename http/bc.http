@@ -1,0 +1,365 @@
+# REF: https://github.com/Huachao/vscode-restclient
+# https://developer.bigcommerce.com/api-reference/store-management/catalog
+
+@base = https://api.bigcommerce.com/stores/{{store_hash}}/v3
+@base2= https://api.bigcommerce.com/stores/{{store_hash}}/v2
+
+# Categories -------------------------------------------------------------------
+### get all
+GET {{base}}/catalog/categories?limit=250
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+### create
+POST {{base}}/catalog/categories
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Snack Food",
+    "parent_id": 0
+}
+
+# Products ---------------------------------------------------------------------
+### get all
+# @name product
+# include *options* only supports limit: 10 per page
+# up limit 250
+GET {{base}}/catalog/products
+    ?include=variants,images
+    &include_fields=sku,inventory_level,inventory_tracking
+    &sort=name
+    &limit=10
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+### create product
+POST {{base}}/catalog/products
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "iPhone 12 Max",
+    "price": "499.00",
+    "sku": "IPHONE12",
+    "categories": [ 1 ],
+    "weight": 0,
+    "type": "physical",
+    "variants": [
+        {
+            "sku": "IPHONE12",
+            "option_values": [
+                {
+                    "option_display_name": "Size",
+                    "label": "128 G"
+                }
+            ]
+        }
+    ],
+    "images": [
+        {
+            "is_thumbnail": true,
+            "image_url": "https://square-production.s3.amazonaws.com/files/510bf3388c37739160afde65b3ce9701da099af0/original.jpeg"
+        }
+    ]
+}
+
+### Update Product
+@prd_id = 801
+PUT {{base}}/catalog/products/{{prd_id}}
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "inventory_level": 44,
+  "images": [
+    {
+      "is_thumbnail": true,
+      "image_url": "https://square-production.s3.amazonaws.com/files/56d9121bfdf38ca7fd36fec9bbe4a5b7f2d883b9/original.jpeg"
+    }
+  ]
+}
+
+### delete (comma separated)
+@ids = 2805
+DELETE {{base}}/catalog/products?id:in={{ids}}
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+### Variants for Inventory
+GET {{base}}/catalog/variants
+    ?limit=250
+    &include_fields=id,product_id,sku,inventory_level
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+### Batch Update Inventory Level
+PUT {{base}}/catalog/variants
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+[
+  { "id": 1946, "inventory_level": 4 }
+]
+
+# Options ----------------------------------------------------------------------
+@prd_id = 11627
+### get
+GET {{base}}/catalog/products/{{prd_id}}/options
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+### create
+POST {{base}}/catalog/products/{{prd_id}}/options
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "display_name": "Default",
+  "type": "rectangles",
+  "option_values": [
+    {
+      "label": "32 GB",
+      "sort_order": 0
+    },
+    {
+      "label": "64 GB",
+      "sort_order": 1
+    }
+  ]
+}
+
+### change option-value name
+@opt_id = 551
+PUT {{base}}/catalog/products/{{prd_id}}/options/{{opt_id}}/values/1274
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "label": "32 GB New"
+}
+
+# Images -----------------------------------------------------------------------
+### set
+POST {{base}}/catalog/products/{{prd_id}}/images
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "image_url": "https://square-production.s3.amazonaws.com/files/556035967005d658aba7218feecf374051688998/original.jpeg"
+}
+
+# Variants (for inventory sync mainly) -----------------------------------------
+### get all
+GET {{base}}/catalog/variants?limit=250&include_fields=id,product_id,sku,price,image_url,upc,inventory_level,option_values
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+### batch update
+PUT {{base}}/catalog/variants
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+[
+    { "id": 1946, "inventory_level": 44 }
+]
+
+### add a variant
+POST {{base}}/catalog/products/4208/variants
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "product_id": 4208,
+    "sku": "IPHONE11-16",
+    "price": 299,
+    "inventory_level": null,
+    "option_values": [
+        {
+            "id": 1279,
+            "option_id": 551
+        }
+    ]
+}
+
+# Channels ---------------------------------------------------------------------
+### get all
+# @name channel
+GET {{base}}/channels
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+### create
+POST {{base}}/channels
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Sample POS",
+    "type": "pos",
+    "platform": "custom",
+    "status": "connected",
+    "is_visible": true,
+    "is_listable_from_ui": true,
+    "config_meta": {
+        "app": {
+            "id": 19987,
+            "sections": [
+                { "title": "Overview", "query_path": "overview" }
+            ]
+        }
+    }
+}
+
+### update
+@channel_id = 20771
+PUT {{base}}/channels/{{channel_id}}
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "name": "Square POS",
+    "status": "disconnected",
+    "is_visible": false,
+    "is_listable_from_ui": false,
+    "config_meta": {
+        "app": {
+            "id": 19987,
+            "sections": []
+        }
+    }
+}
+
+### get listings for channel (from named "channel")
+@id = {{channel.response.body.$.data[?(@.type=="pos")].id}}
+GET {{base}}/channels/{{id}}/listings?limit=500&page=1
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+# Orders -----------------------------------------------------------------------
+###
+# @name orders
+GET {{base2}}/orders
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+### products from order
+@order_id = 100
+GET {{base2}}/orders/{{order_id}}/products
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+# Webhooks ---------------------------------------------------------------------
+###
+GET {{base2}}/hooks
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+### create
+POST {{base2}}/hooks
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "scope": "store/order/*",
+    "destination": "https://iax.requestcatcher.com/",
+    "is_active": true
+}
+
+{"created_at":1617828657,"store_id":"1000776302","producer":"stores/cluiof7n6l","scope":"store/order/created","hash":"314749352dd0aea645566065a18ffb0e2abfbfa9","data":{"type":"order","id":102}}
+
+{"created_at":1617828656,"store_id":"1000776302","producer":"stores/cluiof7n6l","scope":"store/order/updated","hash":"0f57ba0ef94ee472ce2d99210e4294f9f56f1e32","data":{"type":"order","id":102,"status":{"previous_status_id":0,"new_status_id":11}}}
+
+{"created_at":1617828656,"store_id":"1000776302","producer":"stores/cluiof7n6l","scope":"store/order/statusUpdated","hash":"93316d7802118c1ed0ed1d00cae1a23267fdd5f1","data":{"type":"order","id":102,"status":{"previous_status_id":0,"new_status_id":11}}}
+
+### update
+PUT {{base2}}/hooks/21592781
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "scope": "store/order/*",
+    "destination": "https://9651e398b51b.ngrok.io/webhooks/bigcommerce/orders",
+    "headers": {
+        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEyfQ.diSV1dfXJxUA9Rwchq9LP1GNLxhB_dN55QJ0uVxTU64"
+    }
+}
+
+### delete
+DELETE {{base2}}/hooks/21592781
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+# Store -------------------------------------------------------------------
+### get
+GET {{base2}}/store
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+# Currencies -------------------------------------------------------------------
+### get
+GET {{base2}}/currencies
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+# Customers --------------------------------------------------------------------
+### get all
+GET {{base}}/customers
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
