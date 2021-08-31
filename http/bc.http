@@ -25,6 +25,14 @@ Accept: application/json
 }
 
 # Products ---------------------------------------------------------------------
+### summary
+GET {{base}}/catalog/summary
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+
 ### get all
 # @name product
 # include *options* only supports limit: 10 per page
@@ -267,7 +275,7 @@ Accept: application/json
 }
 
 ### get listings for channel (from named "channel")
-@id = {{channel.response.body.$.data[?(@.type=="pos")].id}}
+@id = {{channel.response.body.$.data[?(@.type=="pos" && @.platform=="square")].id}}
 GET {{base}}/channels/{{id}}/listings?limit=500&page=1
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
@@ -363,3 +371,34 @@ X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
 Accept: application/json
+
+# Scripts ----------------------------------------------------------------------
+### get all
+GET {{base}}/content/scripts
+    ?channel_id=1
+    &api_client_id=1
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+### create
+POST {{base}}/content/scripts
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+{
+    "channel_id": channel_config.storefront_channel_id,
+    "name": script[:name],
+    "description": script[:description],
+    "html": script_html,
+    "auto_uninstall": true,
+    "load_method": "default",
+    "location": script[:location],
+    "visibility": script[:visibility],
+    "kind": "script_tag",
+    "consent_category": "analytics",
+    "enabled": true
+}

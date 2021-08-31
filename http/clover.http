@@ -199,7 +199,7 @@ Authorization: Bearer {{token}}
 
 # Orders -----------------------------------------------------------------------
 ### get
-GET {{base_url}}/orders
+GET {{base_url}}/orders?expand=discounts,payments
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
