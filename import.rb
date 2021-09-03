@@ -11,10 +11,10 @@ require 'pry'
 require_relative 'api/clover'
 
 CLOVER_ENV = ENV.fetch('CLOVER_ENV', 'dev')
-MERCHANT_ID = ENV['MERCHANT_ID']
-TOKEN = ENV['TOKEN']
+CL_MERCHANT_ID = ENV['CL_MERCHANT_ID']
+CL_TOKEN = ENV['CL_TOKEN']
 
-clover = Api::Clover.new(CLOVER_ENV.to_sym, MERCHANT_ID, TOKEN)
+clover = Api::Clover.new(CLOVER_ENV.to_sym, CL_MERCHANT_ID, CL_TOKEN)
 
 rc = clover.get_method('categories')
 rp = clover.get_method('items', { expand: 'categories,itemStock,options', return_null_fields: true })
