@@ -1,11 +1,18 @@
 # frozen_string_literal: true
 
 module Api
-  # Handles all Clover API calls
+  # Handles all Clover API
   class Clover
+    # Constant of Clover API
     BASE_URLS = {
       dev: 'apisandbox.dev.clover.com',
       prod: 'api.clover.com'
+    }.freeze
+
+    # Constant of Clover Ecommerce API
+    ECOMM_URLS = {
+      dev: "scl-sandbox.dev.clover.com",
+      prod: "scl.clover.com"
     }.freeze
 
     # @param env [Symbol]
@@ -15,6 +22,8 @@ module Api
     def initialize(env, merchant_id, token)
       raise ArgumentError, "CLOVER_ENV should be one of #{BASE_URLS.keys.inspect}" unless BASE_URLS.keys.include?(env)
       base_url = "https://#{BASE_URLS[env]}/v3/merchants/#{merchant_id}"
+      @env = env
+      @merchant_id = merchant_id
       @client = Faraday.new(url: base_url, headers: headers(token))
     end
 
@@ -84,6 +93,138 @@ module Api
       @client.post('items', prd.to_json, { 'expand' => 'categories,modifierGroups,itemStock,options' })
     end
 
+    # @order id [Hash]
+    # @items [Array]
+    # @shipping [Hash]
+    # @return [Hash]
+    def order_create(order, items, shipping)
+      data = {
+        items: items,
+        shipping: shipping,
+        currency: order['currency'],
+        email: order['email']
+      }
+      # Change url_prefix from the BASE_URLS to ECOMM_URLS of Clover API
+      @client.url_prefix = base_url(for_orders: true)
+      @client.post("orders", data.to_json)
+    end
+
+    # @order [Hash]
+    # @order_type [String]
+    # @items [Array]
+    # @shipping [Hash]
+    # @return [Hash]
+    def atomic_order_create(order, items, order_type, shipping)
+      data = {
+        orderCart: {
+          lineItems: items
+        },
+        orderType: order_type,
+        currency: order['currency'],
+        title: order['title'],
+        note: order['note'],
+        shipping: shipping,
+      }
+      @client.post("atomic_order/orders", data.to_json)
+    end
+
+
+    # @order_id [String]
+    # @line_item_id [String]
+    # @return [Hash]
+    def line_item_create(order_id, line_item_id)
+      data = {
+        item: { id: line_item_id }
+      }
+      @client.post("orders/#{order_id}/line_items", data.to_json)
+    end
+
+
+    # @order_id [String]
+    # @line_item_id [String]
+    # @options [Hash]
+    # @return [Hash]
+    def line_item_update(order_id, line_item_id, options)
+      data = {
+        price: options['price']
+      }
+      @client.post("orders/#{order_id}/line_items/#{line_item_id}", data.to_json)
+    end
+
+    # @order_id [String]
+    # @line_item_id [String]
+    # @return [Hash]
+    def line_items_delete(order_id, line_item_id: nil)
+      # Change url_prefix from the BASE_URLS to ECOMM_URLS of Clover API
+      @client.url_prefix = base_url(for_orders: false)
+      @client.delete("orders/#{order_id}/line_items")
+    end
+
+    # @param for_orders [Boolean]
+    # @return [String]
+    def base_url(for_orders: false)
+      # If for_orders is true the use ECOMM_URLS in order.
+      if for_orders
+        "https://#{ECOMM_URLS[@env]}/v1"
+      else
+        "https://#{BASE_URLS[@env]}/v3/merchants/#{@merchant_id}/"
+      end
+    end
+
+    # @order [Hash]
+    # @return [Array]
+    def set_order_items(order)
+      item_array = []
+      order["items"].each do |item|
+        items = {}
+        items[:amount] = item['amount']
+        items[:currency] = item['currency']
+        items[:description] = item['description']
+        items[:quantity] = item['quantity']
+        items[:type] = item['type']
+        items[:sku] = item['sku']
+        item_array << items
+        item
+      end
+      item_array
+    end
+
+    # @order [Hash]
+    # @return [Hash]
+    def set_order_shipping(order)
+      {
+        city: order['shipping']['city'],
+        line1: order['shipping']['line1'],
+        line2: order['shipping']['line2'],
+        postal_code: order['shipping']['postal_code'],
+        state: order['shipping']['state'],
+        country: order['shipping']['country'],
+        name: order['shipping']['name'],
+        phone: order['shipping']['phone'],
+      }
+    end
+
+    # @order [Hash]
+    # @return [Hash]
+    def set_order_type(order)
+      {
+        order_type: order['order_type']
+      }
+    end
+
+    # @order_id [String]
+    # @order [Hash]
+    # @service_charge_id [String]
+    # @return [Hash]
+    def service_charge_create(order_id, order, service_charge_id)
+      data = {
+        id: service_charge_id,
+        name: order['name'],
+        percentageDecimal: order['percentageDecimal']
+      }
+      @client.post("orders/#{order_id}/service_charge", data.to_json)
+    end
+
     # Attributes =    Color     Size
     # Options    =  Red White  32   64
     def option_item(items)
@@ -142,6 +283,8 @@ module Api
     end
 
     def get_method(endpoint, other_params = {})
+      # Change url_prefix from the BASE_URLS to ECOMM_URLS of Clover API
+      @client.url_prefix = base_url(for_orders: false)
       # limit cannot be greater than 1000
       params = {
                  limit: 1000,
@@ -152,12 +295,18 @@ module Api
         puts "Fetching (#{endpoint}) #{i}"
         res = @client.get(endpoint, params)
         hash = JSON.parse(res.body, symbolize_names: true)
-        elements = hash[:elements]
-        result.concat(elements)
-        should_fetch_next = elements.size == params[:limit]
-        return result unless should_fetch_next
+        # Verify if hash exists the key :elements in order to concat to result array
+        if hash.key?(:elements)
+          elements = hash[:elements]
+          result.concat(elements)
+          should_fetch_next = elements.size == params[:limit]
+          return result unless should_fetch_next
 
-        params[:offset] = params[:limit] + params[:offset]
+          params[:offset] = params[:limit] + params[:offset]
+        else
+          # Verify if hash exists the key :elements in order to concat to result array
+          return hash
+        end
       end
     end
 
