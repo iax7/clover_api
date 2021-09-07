@@ -78,6 +78,7 @@ orders_idx = {}
 catalog['orders'].each do |order|
   puts "Creating Order \e[33m#{order['order']}\e[0m"
 
+  # Verify if use atomic order from clover api or use order from ecommerce api
   if catalog['atomic']
     # Iterate each order and set the items and order type options
     items = clover.set_order_items(order)
@@ -105,11 +106,19 @@ catalog['orders'].each do |order|
     end
 
     # Raise a exception if order type was not found
-    raise ArgumentError, "Order type '#{order_type[:order_type]}' does not exists." unless order_type[:id]
+    raise ArgumentError, "Order type '#{order_type[:order_type]}' does not exists. Setting up in Setup->Order Types" unless order_type[:id]
 
     # Create new atomic order
     new_order = result clover.atomic_order_create(order, items, order_type, shipping)
 
+    # Get service charge by merchant
+    service_charge = clover.get_method('default_service_charge', {})
+
+    # Raise a exception if service charge was not found
+    raise ArgumentError, "Service Charge '#{service_charge[:id]}' does not exists or is not enabled. Setting up in Setup->Additional Charges" unless service_charge[:enabled]
+
+    # Create the service charges or fees to an order
+    new_service_charge = result clover.service_charge_create(new_order[:id], order["fees"], service_charge[:id])
   else
     # Iterate each order and set the items and shipping options
     items = clover.set_order_items(order)

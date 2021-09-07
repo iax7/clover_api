@@ -16,6 +16,9 @@ orders:
       line2: George Avenue 2
       name: Andres Yebra Cervantes
       phone: 6861112233
+    fees:
+      name: BigCcommerce Shipping fee
+      percentageDecimal: 125000
     currency: USD
     title: Bigcommerce Buy
     note: Cancelled
@@ -48,6 +51,9 @@ orders:
       line2: George Avenue 2
       name: Andres Yebra Cervantes
       phone: 6861112233
+    fees:
+      name: BigCcommerce Handling fee
+      percentageDecimal: 125000
     currency: USD
     title: Bigcommerce Buy
     note: Pending
@@ -80,6 +86,9 @@ orders:
       line2: George Avenue 2
       name: Andres Yebra Cervantes
       phone: 6861112233
+    fees:
+      name: BigCcommerce Wrapping fee
+      percentageDecimal: 125000
     currency: USD
     title: Bigcommerce Buy
     note: Completed

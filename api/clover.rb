@@ -109,7 +109,8 @@ module Api
       @client.post("orders", data.to_json)
     end
 
-    # @order id [Hash]
+    # @order [Hash]
+    # @order_type [String]
     # @items [Array]
     # @shipping [Hash]
     # @return [Hash]
@@ -130,7 +131,6 @@ module Api
 
     # @order_id [String]
     # @line_item_id [String]
-    # @options [Hash]
     # @return [Hash]
     def line_item_create(order_id, line_item_id)
       data = {
@@ -153,7 +153,6 @@ module Api
 
     # @order_id [String]
     # @line_item_id [String]
-    # @options [Hash]
     # @return [Hash]
     def line_items_delete(order_id, line_item_id: nil)
       # Change url_prefix from the BASE_URLS to ECOMM_URLS of Clover API
@@ -172,7 +171,7 @@ module Api
       end
     end
 
-    # @order id [Hash]
+    # @order [Hash]
     # @return [Array]
     def set_order_items(order)
       item_array = []
@@ -190,7 +189,7 @@ module Api
       item_array
     end
 
-    # @order id [Hash]
+    # @order [Hash]
     # @return [Hash]
     def set_order_shipping(order)
       {
@@ -205,12 +204,25 @@ module Api
       }
     end
 
-    # @order id [Hash]
+    # @order [Hash]
     # @return [Hash]
     def set_order_type(order)
       {
         order_type: order['order_type']
       }
+    end
+
+    # @order_id [String]
+    # @order [Hash]
+    # @service_charge_id [String]
+    # @return [Hash]
+    def service_charge_create(order_id, order, service_charge_id)
+      data = {
+        id: service_charge_id,
+        name: order['name'],
+        percentageDecimal: order['percentageDecimal']
+      }
+      @client.post("orders/#{order_id}/service_charge", data.to_json)
     end
 
     # Attributes =    Color     Size
@@ -283,12 +295,18 @@ module Api
         puts "Fetching (#{endpoint}) #{i}"
         res = @client.get(endpoint, params)
         hash = JSON.parse(res.body, symbolize_names: true)
-        elements = hash[:elements]
-        result.concat(elements)
-        should_fetch_next = elements.size == params[:limit]
-        return result unless should_fetch_next
+        # Verify if hash exists the key :elements in order to concat to result array
+        if hash.key?(:elements)
+          elements = hash[:elements]
+          result.concat(elements)
+          should_fetch_next = elements.size == params[:limit]
+          return result unless should_fetch_next
 
-        params[:offset] = params[:limit] + params[:offset]
+          params[:offset] = params[:limit] + params[:offset]
+        else
+          # Verify if hash exists the key :elements in order to concat to result array
+          return hash
+        end
       end
     end
 
