@@ -1,0 +1,115 @@
+atomic: true
+orders:
+  - order: 1
+    order_type: Online
+    state: Paid
+    shipping:
+      city: Calexico
+      line1: George Avenue
+      postal_code: 21320
+      state: California
+      country: United States
+      country_iso: US
+      line2: George Avenue 2
+      first_name: Andres
+      last_name: Yebra Cervantes
+      phone: 6861112233
+    fees:
+      name: BigCcommerce Shipping fee
+      percentageDecimal: 125000
+    discounts:
+      name: Discount
+      percentage: 10
+    currency: USD
+    title: Bigcommerce Buy
+    note: Cancelled
+    email: andres.yebra@bigcommerce.com
+    items:
+      - product_id: 1
+        variant_id: 1
+        sku: IP-Black-32
+        price: 29900
+        currency: USD
+        description: iPhone Black 32G
+        quantity: 1
+        type: sku
+      - product_id: 1
+        variant_id: 2
+        sku: IP-Black-64
+        price: 39900
+        currency: USD
+        description: iPhone Black 64G
+        quantity: 1
+        type: sku
+  - order: 2
+    order_type: Delivery
+    shipping:
+      city: Calexico
+      line1: George Avenue
+      postal_code: 21320
+      state: California
+      country: United States
+      country_iso: US
+      line2: George Avenue 2
+      first_name: Andres
+      last_name: Yebra Cervantes
+      phone: 6861112233
+    fees:
+      name: BigCcommerce Handling fee
+      percentageDecimal: 125000
+    discounts:
+      name: Counpo Code
+      percentage: 10
+    currency: USD
+    title: Bigcommerce Buy
+    note: Pending
+    email: andres.yebra@bigcommerce.com
+    items:
+      - product_id: 1
+        variant_id: 3
+        sku: IP-White-32
+        price: 29900
+        currency: USD
+        description: iPhone White 32G
+        quantity: 1
+        type: sku
+      - product_id: 1
+        variant_id: 4
+        sku: IP-White-64
+        price: 39900
+        currency: USD
+        description: iPhone White 64G
+        quantity: 1
+        type: sku
+  - order: 3
+    order_type: Online
+    shipping:
+      city: Calexico
+      line1: George Avenue
+      postal_code: 21320
+      state: California
+      country: United States
+      country_iso: US
+      line2: George Avenue 2
+      first_name: Andres
+      last_name: Yebra Cervantes
+      phone: 6861112233
+    fees:
+      name: BigCcommerce Wrapping fee
+      percentageDecimal: 125000
+    discounts:
+      name: Discount
+      percentage: 8
+    currency: USD
+    title: Bigcommerce Buy
+    note: Completed
+    email: andres.yebra@bigcommerce.com
+    items:
+      - product_id: 1
+        variant_id: 4
+        sku: IP-White-64
+        price: 39900
+        currency: USD
+        description: iPhone White 64G
+        quantity: 3
+        type: sku

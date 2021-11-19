@@ -154,6 +154,13 @@ module Api
     # @order_id [String]
     # @line_item_id [String]
     # @return [Hash]
+    def order_delete(order_id)
+      @client.delete("orders/#{order_id}")
+    end
+
+    # @order_id [String]
+    # @line_item_id [String]
+    # @return [Hash]
     def line_items_delete(order_id, line_item_id: nil)
       # Change url_prefix from the BASE_URLS to ECOMM_URLS of Clover API
       @client.url_prefix = base_url(for_orders: false)
@@ -177,7 +184,7 @@ module Api
       item_array = []
       order["items"].each do |item|
         items = {}
-        items[:amount] = item['amount']
+        items[:price] = item['price']
         items[:currency] = item['currency']
         items[:description] = item['description']
         items[:quantity] = item['quantity']
@@ -198,8 +205,8 @@ module Api
         line2: order['shipping']['line2'],
         postal_code: order['shipping']['postal_code'],
         state: order['shipping']['state'],
-        country: order['shipping']['country'],
-        name: order['shipping']['name'],
+        country: order['shipping']['country_iso'],
+        name: order['shipping']['first_name'],
         phone: order['shipping']['phone'],
       }
     end
@@ -223,6 +230,17 @@ module Api
         percentageDecimal: order['percentageDecimal']
       }
       @client.post("orders/#{order_id}/service_charge", data.to_json)
+    end
+
+    # @order_id [String]
+    # @order [Hash]
+    # @return [Hash]
+    def discount_create(order_id, order)
+      data = {
+        name: order['name'],
+        percentage: order['percentage']
+      }
+      @client.post("orders/#{order_id}/discounts", data.to_json)
     end
 
     # Attributes =    Color     Size

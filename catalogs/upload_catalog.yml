@@ -134,3 +134,25 @@ products:
         sku: IP-White-64
         price: 39900
         stock: 10
+  - name: Macbook Pro
+    categories:
+      - Electronics
+    attributes:
+      - Color
+      - Size
+    options:
+      Size:
+        - 256G
+        - 500G
+      Color:
+        - Black
+        - Gray
+    variants:
+      - name: Macbook Pro 256G
+        sku: MB-256G-I7
+        price: 100000
+        stock: 25
+      - name: Macbook Pro 500G
+        sku: MB-500G-I7
+        price: 100000
+        stock: 25

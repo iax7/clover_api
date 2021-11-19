@@ -11,10 +11,10 @@ require_relative 'api/clover'
 require_relative 'helpers/helper'
 
 CLOVER_ENV = ENV.fetch('CLOVER_ENV', 'dev')
-MERCHANT_ID = ENV['MERCHANT_ID']
-TOKEN = ENV['TOKEN']
+CL_MERCHANT_ID = ENV['CL_MERCHANT_ID']
+CL_TOKEN = ENV['CL_TOKEN']
 
-clover = Api::Clover.new(CLOVER_ENV.to_sym, MERCHANT_ID, TOKEN)
+clover = Api::Clover.new(CLOVER_ENV.to_sym, CL_MERCHANT_ID, CL_TOKEN)
 
 Helpers::Helper.headline 'Categories'
 categories = clover.get_method('categories')
@@ -24,12 +24,18 @@ categories.each do |category|
   clover.category_delete(category[:id])
 end
 
-puts
-
 Helpers::Helper.headline 'Item Groups'
 item_groups = clover.get_method('item_groups')
 puts "Total: #{item_groups.size}"
 item_groups.each do |ig|
   puts "Deleting #{ig[:id]} - #{ig[:name].inspect}..."
   clover.item_group_delete(ig[:id])
+end
+
+Helpers::Helper.headline 'Orders'
+orders = clover.get_method('orders', {})
+puts "Total: #{orders.size}"
+orders.each do |order|
+  puts "Deleting Order \e[33m#{order[:id]}\e[0m"
+  clover.order_delete(order[:id])
 end
