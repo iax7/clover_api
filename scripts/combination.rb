@@ -1,4 +1,4 @@
-require 'pry'
+require "pry"
 
 def attr_opt_combinations(x)
   num_variants = x.values.map(&:size).reduce(&:*)
@@ -7,14 +7,12 @@ def attr_opt_combinations(x)
   combinations = []
   keys = x.keys.reverse
 
-  if keys.size == 1
-    return x.values.first.map { [_1] }
-  end
+  return x.values.first.map { [_1] } if keys.size == 1
 
   # positive
   pair = keys[0..1]
   b, a = pair # reversed
-  keys = keys - pair
+  keys -= pair
   combinations.concat comb(x[a], x[b])
 
   while keys.size.positive?
@@ -25,26 +23,26 @@ def attr_opt_combinations(x)
   combinations
 end
 
-def comb(a,b)
+def comb(a, b)
   a.each_with_object([]) do |s1, res|
-    b.each {|s2| res << [s1, *s2 ] }
+    b.each { |s2| res << [s1, *s2] }
   end
 end
 
-x = {:color=>["red", "white"], :size=>[32, 64]}
+x = { color: %w[red white], size: [32, 64] }
 p attr_opt_combinations(x)
 
-x = {:color=>["red", "white"], :size=>[32, 64, 128]}
+x = { color: %w[red white], size: [32, 64, 128] }
 p attr_opt_combinations(x)
 
-x = {:color=>["red", "white", "black"], :size=>[32, 64]}
+x = { color: %w[red white black], size: [32, 64] }
 p attr_opt_combinations(x)
 
-x = {:color=>["red", "white", "black"]}
+x = { color: %w[red white black] }
 p attr_opt_combinations(x)
 
-x = {:color=>[:x, :y], :size=>[:w, :z], :top=>[:a, :b]}
+x = { color: %i[x y], size: %i[w z], top: %i[a b] }
 p attr_opt_combinations(x)
 
-x = {:color=>[:x, :y], :size=>[:w, :z], :top=>[:a, :b, :c]}
+x = { color: %i[x y], size: %i[w z], top: %i[a b c] }
 p attr_opt_combinations(x)

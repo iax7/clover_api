@@ -19,16 +19,16 @@ module Api
     # @return [Hash]
     def set_billing_address(order)
       {
-        city: order['shipping']['city'],
-        street_1: order['shipping']['line1'],
-        street_2: order['shipping']['line2'],
-        zip: order['shipping']['postal_code'],
-        state: order['shipping']['state'],
-        country: order['shipping']['country'],
-        country_iso2: order['shipping']['country_iso'],
-        first_name: order['shipping']['first_name'],
-        last_name: order['shipping']['last_name'],
-        phone: order['shipping']['phone'],
+        city: order["shipping"]["city"],
+        street_1: order["shipping"]["line1"],
+        street_2: order["shipping"]["line2"],
+        zip: order["shipping"]["postal_code"],
+        state: order["shipping"]["state"],
+        country: order["shipping"]["country"],
+        country_iso2: order["shipping"]["country_iso"],
+        first_name: order["shipping"]["first_name"],
+        last_name: order["shipping"]["last_name"],
+        phone: order["shipping"]["phone"]
       }
     end
 
@@ -38,11 +38,11 @@ module Api
       produtcs = []
       order["items"].each do |item|
         items = {}
-        items[:name] = item['description']
-        items[:quantity] = item['quantity']
-        items[:price_inc_tax] = (item['price'] / 100)
-        items[:price_ex_tax] = (item['price'] / 100)
-        items[:sku] = item['sku']
+        items[:name] = item["description"]
+        items[:quantity] = item["quantity"]
+        items[:price_inc_tax] = (item["price"] / 100)
+        items[:price_ex_tax] = (item["price"] / 100)
+        items[:sku] = item["sku"]
         produtcs << items
         item
       end
@@ -57,9 +57,9 @@ module Api
       data = {
         products: products,
         billing_address: billing_address,
-        discount_amount: (order['discounts']['percentage']),
-        wrapping_cost_ex_tax: (order['fees']['percentageDecimal'] / 1000),
-        wrapping_cost_inc_tax: (order['fees']['percentageDecimal'] / 1000)
+        discount_amount: (order["discounts"]["percentage"]),
+        wrapping_cost_ex_tax: (order["fees"]["percentageDecimal"] / 1000),
+        wrapping_cost_inc_tax: (order["fees"]["percentageDecimal"] / 1000)
       }
       @client.post("orders", data.to_json)
     end
@@ -68,9 +68,9 @@ module Api
 
     def headers(token)
       {
-        'Content-Type' => 'application/json',
-        'Accept' => 'application/json',
-        'X-Auth-Token' => token
+        "Content-Type" => "application/json",
+        "Accept" => "application/json",
+        "X-Auth-Token" => token
       }.freeze
     end
   end

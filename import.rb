@@ -3,24 +3,24 @@
 
 # @see https://docs.clover.com/reference#inventorygetitems-1
 
-require 'dotenv/load'
-require 'faraday'
-require 'json'
-require 'pry'
+require "dotenv/load"
+require "faraday"
+require "json"
+require "pry"
 
-require_relative 'api/clover'
+require_relative "api/clover"
 
-CLOVER_ENV = ENV.fetch('CLOVER_ENV', 'dev')
-CL_MERCHANT_ID = ENV['CL_MERCHANT_ID']
-CL_TOKEN = ENV['CL_TOKEN']
+CLOVER_ENV = ENV.fetch("CLOVER_ENV", "dev")
+CL_MERCHANT_ID = ENV["CL_MERCHANT_ID"]
+CL_TOKEN = ENV["CL_TOKEN"]
 
 clover = Api::Clover.new(CLOVER_ENV.to_sym, CL_MERCHANT_ID, CL_TOKEN)
 
-rc = clover.get_method('categories')
-rp = clover.get_method('items', { expand: 'categories,itemStock,options', return_null_fields: true })
-rg = clover.get_method('item_groups', { expand: 'attributes' })
+rc = clover.get_method("categories")
+rp = clover.get_method("items", { expand: "categories,itemStock,options", return_null_fields: true })
+rg = clover.get_method("item_groups", { expand: "attributes" })
 
-puts 'Digesting...'
+puts "Digesting..."
 
 # Main product
 prd = rg.each_with_object({}) do |v, res|
@@ -57,22 +57,22 @@ rp.each do |var|
   end
   if prd_id # is a variant
     parent = prd[prd_id]
-    parent[:inventory_tracking] = inv.nil? ? 'none' : "variant"
+    parent[:inventory_tracking] = inv.nil? ? "none" : "variant"
     parent[:variants] << new_var
   else # is a standalone product
-    new_var[:inventory_tracking] = inv.nil? ? 'none' : 'product'
+    new_var[:inventory_tracking] = inv.nil? ? "none" : "product"
     prd[id] = new_var
   end
 end
 
-puts 'done.'
+puts "done."
 
 # Changes ----------------------------------------------------------------------
 def item_group(name)
   data = {
     name: name
   }
-  client.post('item_groups', data.to_json)
+  client.post("item_groups", data.to_json)
 end
 
 def attributes(item_group_id, name)
@@ -82,7 +82,7 @@ def attributes(item_group_id, name)
       id: item_group_id
     }
   }
-  client.post('attributes', data.to_json)
+  client.post("attributes", data.to_json)
 end
 
 def options(name)
@@ -101,11 +101,11 @@ def product(item_group_id = nil)
   prd = {
     name: "Product #{id}",
     sku: "sku #{id}",
-    code: 'UPC',
+    code: "UPC",
     price: 1990
   }
   prd[:itemGroup] = ig if item_group_id
-  client.post('items', prd.to_json, { 'expand' => 'categories,modifierGroups,itemStock,options' })
+  client.post("items", prd.to_json, { "expand" => "categories,modifierGroups,itemStock,options" })
 end
 
 def category
@@ -113,5 +113,5 @@ def category
   data = {
     name: "Category #{Time.now.to_i}"
   }
-  client.post('categories', data.to_json)
+  client.post("categories", data.to_json)
 end

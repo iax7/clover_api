@@ -5,8 +5,8 @@ module Api
   class Clover
     # Constant of Clover API
     BASE_URLS = {
-      dev: 'apisandbox.dev.clover.com',
-      prod: 'api.clover.com'
+      dev: "apisandbox.dev.clover.com",
+      prod: "api.clover.com"
     }.freeze
 
     # Constant of Clover Ecommerce API
@@ -21,6 +21,7 @@ module Api
     # @return [self]
     def initialize(env, merchant_id, token)
       raise ArgumentError, "CLOVER_ENV should be one of #{BASE_URLS.keys.inspect}" unless BASE_URLS.keys.include?(env)
+
       base_url = "https://#{BASE_URLS[env]}/v3/merchants/#{merchant_id}"
       @env = env
       @merchant_id = merchant_id
@@ -31,7 +32,7 @@ module Api
       data = {
         name: name
       }
-      @client.post('categories', data.to_json)
+      @client.post("categories", data.to_json)
     end
 
     def category_delete(id)
@@ -48,14 +49,14 @@ module Api
       itm_opt = {
         elements: elements
       }
-      @client.post('category_items', itm_opt.to_json)
+      @client.post("category_items", itm_opt.to_json)
     end
 
     def item_group_create(name)
       data = {
         name: name
       }
-      @client.post('item_groups', data.to_json)
+      @client.post("item_groups", data.to_json)
     end
 
     def item_group_delete(id)
@@ -69,7 +70,7 @@ module Api
           id: item_group_id
         }
       }
-      @client.post('attributes', data.to_json)
+      @client.post("attributes", data.to_json)
     end
 
     def options_create(attribute_id, name)
@@ -90,7 +91,7 @@ module Api
         price: price
       }
       prd[:itemGroup] = ig if item_group_id
-      @client.post('items', prd.to_json, { 'expand' => 'categories,modifierGroups,itemStock,options' })
+      @client.post("items", prd.to_json, { "expand" => "categories,modifierGroups,itemStock,options" })
     end
 
     # @order id [Hash]
@@ -101,8 +102,8 @@ module Api
       data = {
         items: items,
         shipping: shipping,
-        currency: order['currency'],
-        email: order['email']
+        currency: order["currency"],
+        email: order["email"]
       }
       # Change url_prefix from the BASE_URLS to ECOMM_URLS of Clover API
       @client.url_prefix = base_url(for_orders: true)
@@ -120,14 +121,13 @@ module Api
           lineItems: items
         },
         orderType: order_type,
-        currency: order['currency'],
-        title: order['title'],
-        note: order['note'],
-        shipping: shipping,
+        currency: order["currency"],
+        title: order["title"],
+        note: order["note"],
+        shipping: shipping
       }
       @client.post("atomic_order/orders", data.to_json)
     end
-
 
     # @order_id [String]
     # @line_item_id [String]
@@ -139,14 +139,13 @@ module Api
       @client.post("orders/#{order_id}/line_items", data.to_json)
     end
 
-
     # @order_id [String]
     # @line_item_id [String]
     # @options [Hash]
     # @return [Hash]
     def line_item_update(order_id, line_item_id, options)
       data = {
-        price: options['price']
+        price: options["price"]
       }
       @client.post("orders/#{order_id}/line_items/#{line_item_id}", data.to_json)
     end
@@ -184,12 +183,12 @@ module Api
       item_array = []
       order["items"].each do |item|
         items = {}
-        items[:price] = item['price']
-        items[:currency] = item['currency']
-        items[:description] = item['description']
-        items[:quantity] = item['quantity']
-        items[:type] = item['type']
-        items[:sku] = item['sku']
+        items[:price] = item["price"]
+        items[:currency] = item["currency"]
+        items[:description] = item["description"]
+        items[:quantity] = item["quantity"]
+        items[:type] = item["type"]
+        items[:sku] = item["sku"]
         item_array << items
         item
       end
@@ -200,14 +199,14 @@ module Api
     # @return [Hash]
     def set_order_shipping(order)
       {
-        city: order['shipping']['city'],
-        line1: order['shipping']['line1'],
-        line2: order['shipping']['line2'],
-        postal_code: order['shipping']['postal_code'],
-        state: order['shipping']['state'],
-        country: order['shipping']['country_iso'],
-        name: order['shipping']['first_name'],
-        phone: order['shipping']['phone'],
+        city: order["shipping"]["city"],
+        line1: order["shipping"]["line1"],
+        line2: order["shipping"]["line2"],
+        postal_code: order["shipping"]["postal_code"],
+        state: order["shipping"]["state"],
+        country: order["shipping"]["country_iso"],
+        name: order["shipping"]["first_name"],
+        phone: order["shipping"]["phone"]
       }
     end
 
@@ -215,7 +214,7 @@ module Api
     # @return [Hash]
     def set_order_type(order)
       {
-        order_type: order['order_type']
+        order_type: order["order_type"]
       }
     end
 
@@ -226,8 +225,8 @@ module Api
     def service_charge_create(order_id, order, service_charge_id)
       data = {
         id: service_charge_id,
-        name: order['name'],
-        percentageDecimal: order['percentageDecimal']
+        name: order["name"],
+        percentageDecimal: order["percentageDecimal"]
       }
       @client.post("orders/#{order_id}/service_charge", data.to_json)
     end
@@ -237,8 +236,8 @@ module Api
     # @return [Hash]
     def discount_create(order_id, order)
       data = {
-        name: order['name'],
-        percentage: order['percentage']
+        name: order["name"],
+        percentage: order["percentage"]
       }
       @client.post("orders/#{order_id}/discounts", data.to_json)
     end
@@ -247,8 +246,8 @@ module Api
     # Options    =  Red White  32   64
     def option_item(items)
       elements = []
-      create_option = ->(prd, opt) { { "option": { "id": opt }, "item": { "id": prd } } }
-      items.each_with_object(elements) do |var,res|
+      create_option = ->(prd, opt) { { option: { id: opt }, item: { id: prd } } }
+      items.each_with_object(elements) do |var, res|
         item = create_option.curry[var[:id]]
         var[:_options].each do |o|
           res << item.call(o)
@@ -256,9 +255,9 @@ module Api
       end
 
       itm_opt = {
-        "elements": elements
+        elements: elements
       }
-      @client.post('option_items', itm_opt.to_json)
+      @client.post("option_items", itm_opt.to_json)
     end
 
     def group_attr_opt_ids(attributes, options)
@@ -276,7 +275,7 @@ module Api
       # positive
       pair = keys[0..1]
       b, a = pair # reversed
-      keys = keys - pair
+      keys -= pair
       combinations.concat comb(x[a], x[b])
 
       while keys.size.positive?
@@ -295,7 +294,7 @@ module Api
 
     def stock_create(product_id, stock_count)
       itm_opt = {
-        "quantity": stock_count
+        quantity: stock_count
       }
       @client.post("item_stocks/#{product_id}", itm_opt.to_json)
     end
@@ -305,9 +304,9 @@ module Api
       @client.url_prefix = base_url(for_orders: false)
       # limit cannot be greater than 1000
       params = {
-                 limit: 1000,
-                 offset: 0
-               }.merge(other_params)
+        limit: 1000,
+        offset: 0
+      }.merge(other_params)
       result = []
       (1...).each do |i|
         puts "Fetching (#{endpoint}) #{i}"
@@ -332,9 +331,9 @@ module Api
 
     def headers(token)
       {
-        'Content-Type' => 'application/json',
-        'Accept' => 'application/json',
-        'Authorization' => "Bearer #{token}"
+        "Content-Type" => "application/json",
+        "Accept" => "application/json",
+        "Authorization" => "Bearer #{token}"
       }.freeze
     end
   end
