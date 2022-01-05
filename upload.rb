@@ -4,6 +4,7 @@
 require "yaml"
 require "dotenv/load"
 require "faraday"
+require "faraday_middleware"
 require "json"
 require "pry"
 
@@ -22,14 +23,15 @@ catalog = YAML.load_file(CATALOG_FILE)
 categories_idx = {}
 
 def result(res)
-  JSON.parse(res.body, symbolize_names: true)
+  # JSON.parse(res.body, symbolize_names: true)
+  res.body
 end
 
 create_product = proc do |product|
   name = product["name"]
   puts "Creating \e[33m#{name}\e[0m (No variants)"
 
-  new_prd = result(clover.product_create(nil, product["name"], product["sku"], product["price"]))
+  new_prd = clover.product_create(nil, product["name"], product["sku"], product["price"])
   clover.category_items(new_prd[:id], categories_idx, product["categories"]) if product["categories"]&.size&.positive?
   clover.stock_create(new_prd[:id], product["stock"]) if product["stock"]
 end
@@ -37,7 +39,7 @@ end
 product_with_variants = proc do |product|
   name = product["name"]
   puts "Creating \e[33m#{name}\e[0m"
-  item_group = result clover.item_group_create(name)
+  item_group = result(clover.item_group_create(name))
 
   attributes = []
   product["attributes"].each do |a_name|
@@ -76,7 +78,7 @@ end
 Helpers::Helper.headline("Categories")
 catalog["categories"].each do |category_name|
   puts "Creating \e[33m#{category_name}\e[0m"
-  new_category = result clover.category_create(category_name)
+  new_category = result(clover.category_create(category_name))
   categories_idx[new_category[:name]] = new_category[:id]
 end
 

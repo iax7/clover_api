@@ -24,6 +24,8 @@ GEM
     faraday-net_http_persistent (1.2.0)
     faraday-patron (1.0.0)
     faraday-rack (1.0.0)
+    faraday_middleware (1.2.0)
+      faraday (~> 1.0)
     method_source (1.0.0)
     multipart-post (2.1.1)
     parallel (1.21.0)
@@ -59,6 +61,7 @@ PLATFORMS
 DEPENDENCIES
   dotenv
   faraday (< 2.0)
+  faraday_middleware (~> 1.2)
   pry-byebug
   rubocop
 

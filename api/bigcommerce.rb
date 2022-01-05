@@ -3,16 +3,25 @@
 module Api
   # Handles all Bigcommerce API
   class Bigcommerce
-    # Constant of Bigcommerce API
-    BASE_URL = "api.bigcommerce.com"
+    BASE_URL = "https://api.bigcommerce.com"
+    DEFAULT_QUERY_PARAMS = {
+      limit: 250,
+      page: 1
+    }.freeze
 
     # @param store_hash [String]
     # @param token [String]
     # @return [self]
     def initialize(store_hash, token)
-      base_url = "https://#{BASE_URL}/stores/#{store_hash}/v2/"
+      store_url = URI.join(BASE_URL, "stores/#{store_hash}/v2/")
       @store_hash = store_hash
-      @client = Faraday.new(url: base_url, headers: headers(token))
+      @connection = Faraday.new(url: store_url, ssl: {}) do |faraday|
+        faraday.headers = headers(token)
+        faraday.request :json
+        faraday.response :json, parser_options: { symbolize_names: true }
+        faraday.use FaradayMiddleware::Gzip
+        faraday.adapter Faraday.default_adapter
+      end
     end
 
     # @order [Hash]
@@ -35,7 +44,7 @@ module Api
     # @order [Hash]
     # @return [Array]
     def set_order_product_items(order)
-      produtcs = []
+      products = []
       order["items"].each do |item|
         items = {}
         items[:name] = item["description"]
@@ -43,10 +52,10 @@ module Api
         items[:price_inc_tax] = (item["price"] / 100)
         items[:price_ex_tax] = (item["price"] / 100)
         items[:sku] = item["sku"]
-        produtcs << items
+        products << items
         item
       end
-      produtcs
+      products
     end
 
     # @order id [Hash]
@@ -61,10 +70,12 @@ module Api
         wrapping_cost_ex_tax: (order["fees"]["percentageDecimal"] / 1000),
         wrapping_cost_inc_tax: (order["fees"]["percentageDecimal"] / 1000)
       }
-      @client.post("orders", data.to_json)
+      connection.post("orders", data.to_json)
     end
 
     private
+
+    attr_reader :connection, :store_hash
 
     def headers(token)
       {

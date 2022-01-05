@@ -3,10 +3,13 @@
 module Api
   # Handles all Clover API
   class Clover
-    # Constant of Clover API
     BASE_URLS = {
       dev: "apisandbox.dev.clover.com",
       prod: "api.clover.com"
+    }.freeze
+    DEFAULT_QUERY_PARAMS = {
+      limit: 500, # limit cannot be greater than 1000
+      offset: 0
     }.freeze
 
     # Constant of Clover Ecommerce API
@@ -22,21 +25,26 @@ module Api
     def initialize(env, merchant_id, token)
       raise ArgumentError, "CLOVER_ENV should be one of #{BASE_URLS.keys.inspect}" unless BASE_URLS.keys.include?(env)
 
-      base_url = "https://#{BASE_URLS[env]}/v3/merchants/#{merchant_id}"
+      url = "https://#{BASE_URLS[env]}/v3/merchants/#{merchant_id}/"
       @env = env
       @merchant_id = merchant_id
-      @client = Faraday.new(url: base_url, headers: headers(token))
+      @connection = Faraday.new(url: url) do |faraday|
+        faraday.request :authorization, "Bearer", token
+        faraday.request :json
+        faraday.response :json, parser_options: { symbolize_names: true }
+        faraday.adapter Faraday.default_adapter
+      end
     end
 
     def category_create(name)
       data = {
         name: name
       }
-      @client.post("categories", data.to_json)
+      connection.post("categories", data.to_json)
     end
 
     def category_delete(id)
-      @client.delete("categories/#{id}")
+      connection.delete("categories/#{id}")
     end
 
     def category_items(product_id, categories_idx, categories)
@@ -49,22 +57,22 @@ module Api
       itm_opt = {
         elements: elements
       }
-      @client.post("category_items", itm_opt.to_json)
+      connection.post("category_items", itm_opt.to_json)
     end
 
     def item_group_create(name)
       data = {
         name: name
       }
-      @client.post("item_groups", data.to_json)
+      connection.post("item_groups", data.to_json)
     end
 
     def item_group_delete(id)
-      @client.delete("item_groups/#{id}")
+      connection.delete("item_groups/#{id}")
     end
 
     def item_delete(id)
-      @client.delete("items/#{id}")
+      connection.delete("items/#{id}")
     end
 
     def attributes_create(item_group_id, name)
@@ -74,14 +82,14 @@ module Api
           id: item_group_id
         }
       }
-      @client.post("attributes", data.to_json)
+      connection.post("attributes", data.to_json)
     end
 
     def options_create(attribute_id, name)
       data = {
         name: name
       }
-      @client.post("attributes/#{attribute_id}/options", data.to_json)
+      connection.post("attributes/#{attribute_id}/options", data.to_json)
     end
 
     def product_create(item_group_id, name, sku, price)
@@ -95,7 +103,7 @@ module Api
         price: price
       }
       prd[:itemGroup] = ig if item_group_id
-      @client.post("items", prd.to_json, { "expand" => "categories,modifierGroups,itemStock,options" })
+      connection.post("items", prd.to_json, { "expand" => "categories,modifierGroups,itemStock,options" })
     end
 
     # @order id [Hash]
@@ -110,8 +118,8 @@ module Api
         email: order["email"]
       }
       # Change url_prefix from the BASE_URLS to ECOMM_URLS of Clover API
-      @client.url_prefix = base_url(for_orders: true)
-      @client.post("orders", data.to_json)
+      connection.url_prefix = base_url(for_orders: true)
+      connection.post("orders", data.to_json)
     end
 
     # @order [Hash]
@@ -130,7 +138,7 @@ module Api
         note: order["note"],
         shipping: shipping
       }
-      @client.post("atomic_order/orders", data.to_json)
+      connection.post("atomic_order/orders", data.to_json)
     end
 
     # @order_id [String]
@@ -140,7 +148,7 @@ module Api
       data = {
         item: { id: line_item_id }
       }
-      @client.post("orders/#{order_id}/line_items", data.to_json)
+      connection.post("orders/#{order_id}/line_items", data.to_json)
     end
 
     # @order_id [String]
@@ -151,14 +159,14 @@ module Api
       data = {
         price: options["price"]
       }
-      @client.post("orders/#{order_id}/line_items/#{line_item_id}", data.to_json)
+      connection.post("orders/#{order_id}/line_items/#{line_item_id}", data.to_json)
     end
 
     # @order_id [String]
     # @line_item_id [String]
     # @return [Hash]
     def order_delete(order_id)
-      @client.delete("orders/#{order_id}")
+      connection.delete("orders/#{order_id}")
     end
 
     # @order_id [String]
@@ -166,8 +174,8 @@ module Api
     # @return [Hash]
     def line_items_delete(order_id, line_item_id: nil)
       # Change url_prefix from the BASE_URLS to ECOMM_URLS of Clover API
-      @client.url_prefix = base_url(for_orders: false)
-      @client.delete("orders/#{order_id}/line_items")
+      connection.url_prefix = base_url(for_orders: false)
+      connection.delete("orders/#{order_id}/line_items")
     end
 
     # @param for_orders [Boolean]
@@ -232,7 +240,7 @@ module Api
         name: order["name"],
         percentageDecimal: order["percentageDecimal"]
       }
-      @client.post("orders/#{order_id}/service_charge", data.to_json)
+      connection.post("orders/#{order_id}/service_charge", data.to_json)
     end
 
     # @order_id [String]
@@ -243,7 +251,7 @@ module Api
         name: order["name"],
         percentage: order["percentage"]
       }
-      @client.post("orders/#{order_id}/discounts", data.to_json)
+      connection.post("orders/#{order_id}/discounts", data.to_json)
     end
 
     # Attributes =    Color     Size
@@ -261,7 +269,7 @@ module Api
       itm_opt = {
         elements: elements
       }
-      @client.post("option_items", itm_opt.to_json)
+      connection.post("option_items", itm_opt.to_json)
     end
 
     def group_attr_opt_ids(attributes, options)
@@ -300,22 +308,19 @@ module Api
       itm_opt = {
         quantity: stock_count
       }
-      @client.post("item_stocks/#{product_id}", itm_opt.to_json)
+      connection.post("item_stocks/#{product_id}", itm_opt.to_json)
     end
 
-    def get_method(endpoint, other_params = {})
+    def get_method(endpoint, additional_params = {})
       # Change url_prefix from the BASE_URLS to ECOMM_URLS of Clover API
-      @client.url_prefix = base_url(for_orders: false)
+      connection.url_prefix = base_url(for_orders: false)
       # limit cannot be greater than 1000
-      params = {
-        limit: 1000,
-        offset: 0
-      }.merge(other_params)
+      params = DEFAULT_QUERY_PARAMS.merge(additional_params)
       result = []
       (1...).each do |i|
         puts "Fetching (#{endpoint}) #{i}"
-        res = @client.get(endpoint, params)
-        hash = JSON.parse(res.body, symbolize_names: true)
+        res = connection.get(endpoint, params)
+        hash = res.body
         # Verify if hash exists the key :elements in order to concat to result array
         if hash.key?(:elements)
           elements = hash[:elements]
@@ -333,12 +338,6 @@ module Api
 
     private
 
-    def headers(token)
-      {
-        "Content-Type" => "application/json",
-        "Accept" => "application/json",
-        "Authorization" => "Bearer #{token}"
-      }.freeze
-    end
+    attr_reader :env, :merchant_id, :connection
   end
 end
