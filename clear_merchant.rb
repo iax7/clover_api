@@ -32,6 +32,14 @@ item_groups.each do |ig|
   clover.item_group_delete(ig[:id])
 end
 
+Helpers::Helper.headline "Products"
+items = clover.get_method("items")
+puts "Total: #{items.size}"
+items.each do |ig|
+  puts "Deleting #{ig[:id]} - #{ig[:name].inspect}..."
+  clover.item_delete(ig[:id])
+end
+
 Helpers::Helper.headline "Orders"
 orders = clover.get_method("orders", {})
 puts "Total: #{orders.size}"

@@ -63,6 +63,10 @@ module Api
       @client.delete("item_groups/#{id}")
     end
 
+    def item_delete(id)
+      @client.delete("items/#{id}")
+    end
+
     def attributes_create(item_group_id, name)
       data = {
         name: name,
