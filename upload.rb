@@ -31,7 +31,7 @@ create_product = proc do |product|
   name = product["name"]
   puts "Creating \e[33m#{name}\e[0m (No variants)"
 
-  new_prd = clover.product_create(nil, product["name"], product["sku"], product["price"])
+  new_prd = result(clover.product_create(nil, product["name"], product["sku"], product["price"]))
   clover.category_items(new_prd[:id], categories_idx, product["categories"]) if product["categories"]&.size&.positive?
   clover.stock_create(new_prd[:id], product["stock"]) if product["stock"]
 end

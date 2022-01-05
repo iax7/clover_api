@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "pry"
 
 def attr_opt_combinations(x)

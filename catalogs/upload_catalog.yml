@@ -28,20 +28,20 @@ products:
     variants:
       - name: iPhone Black 32G
         sku: IP-Black-32
-        price: 29900
-        stock: 10
+        price: 69900
+        stock: 32
       - name: iPhone Black 64G
         sku: IP-Black-64
-        price: 39900
-        stock: 20
+        price: 89900
+        stock: 64
       - name: iPhone White 32G
         sku: IP-White-32
-        price: 29900
-        stock: 30
+        price: 69900
+        stock: 23
       - name: iPhone White 64G
         sku: IP-White-64
-        price: 39900
-        stock: 10
+        price: 89900
+        stock: 46
   - name: MacBook Pro
     categories:
       - Electronics
@@ -57,10 +57,10 @@ products:
         - Gray
     variants:
       - name: Macbook Pro 256G
-        sku: MB-256G-I7
-        price: 100000
+        sku: MB-256G-M1
+        price: 300000
         stock: 25
       - name: Macbook Pro 500G
-        sku: MB-500G-I7
-        price: 100000
-        stock: 25
+        sku: MB-500G-M1
+        price: 450000
+        stock: 50
