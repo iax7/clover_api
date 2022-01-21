@@ -13,7 +13,7 @@ module Api
     # @param token [String]
     # @return [self]
     def initialize(store_hash, token)
-      store_url = URI.join(BASE_URL, "stores/#{store_hash}/v2/")
+      store_url = URI.join(BASE_URL, "stores/#{store_hash}/")
       @store_hash = store_hash
       @connection = Faraday.new(url: store_url, ssl: {}) do |faraday|
         faraday.headers = headers(token)
@@ -70,7 +70,32 @@ module Api
         wrapping_cost_ex_tax: (order["fees"]["percentageDecimal"] / 1000),
         wrapping_cost_inc_tax: (order["fees"]["percentageDecimal"] / 1000)
       }
-      connection.post("orders", data.to_json)
+      connection.post("v2/orders", data.to_json)
+    end
+
+    def product_delete(id)
+      connection.delete("v3/catalog/products/#{id}")
+    end
+
+    # @param endpoint [String]
+    # @param additional_params [Hash]
+    # @return [Array]
+    def get_method(endpoint, additional_params = {})
+      query_params = DEFAULT_QUERY_PARAMS.merge(additional_params)
+
+      total_pages = nil
+      result = nil
+      (1...).each do |page|
+        response = connection.get(endpoint, query_params)
+
+        result = result.nil? ? response.body[:data] : result.concat(response.body[:data])
+        total_pages ||= response.body&.dig(:meta, :pagination, :total_pages)
+
+        more_pages_to_fetch = page < total_pages
+        return result unless more_pages_to_fetch
+
+        query_params[:page] = page.next
+      end
     end
 
     private

@@ -20,7 +20,8 @@ puts "Loading catalog file: \e[33m#{CATALOG_FILE}\e[0m..."
 catalog = YAML.load_file(CATALOG_FILE)
 
 def result(res)
-  JSON.parse(res.body, symbolize_names: true)
+  # JSON.parse(res.body, symbolize_names: true)
+  res.body
 end
 
 Helpers::Helper.headline("Orders")
