@@ -4,8 +4,9 @@ You will need to install [REST Client for Visual Studio Code](https://marketplac
 Configure VS Code settings to use http files in this folder.
 
 Configure the environment variables and select it (REST CLient Environment):
+![image](https://user-images.githubusercontent.com/6983510/161328698-5ee11421-4f6b-4220-81fa-4c8dacc2d8e7.png)
 
-```json
+```jsonc
     "rest-client.environmentVariables": {
         "$shared": {
             // BigCommerce (bigcommerce.http)
