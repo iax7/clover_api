@@ -4,7 +4,7 @@ module Api
   # Handles all Clover API
   class Clover
     BASE_URLS = {
-      dev: "apisandbox.dev.clover.com",
+      dev: "sandbox.dev.clover.com",
       prod: "api.clover.com"
     }.freeze
     DEFAULT_QUERY_PARAMS = {
