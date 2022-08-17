@@ -6,8 +6,9 @@
 
 @prod_base = api.clover.com
 @dev_base = apisandbox.dev.clover.com
+@token = {{$dotenv CL_TOKEN}}
+@cl_merchant_id = {{$dotenv CL_MERCHANT_ID}}
 @base_url = https://{{dev_base}}/v3/merchants/{{cl_merchant_id}}
-@token = {{cl_token}}
 
 ### merchant -------------------------------------------------------------------
 GET {{base_url}}

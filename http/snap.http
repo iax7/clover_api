@@ -1,0 +1,30 @@
+
+@org_id = {{$dotenv SC_ORGANIZATION_ID}}
+@token = {{$dotenv SC_TOKEN}}
+@base_url = https://adsapi.snapchat.com/v1
+
+### user
+GET {{base_url}}/me
+Authorization: Bearer {{token}}
+
+### orgs
+GET {{base_url}}/me/organizations
+    ?with_ad_accounts=true
+Authorization: Bearer {{token}}
+
+# ORGANIZATION
+@org_url = {{base_url}}/organizations/{{org_id}}
+
+### get catalog
+GET {{org_url}}/catalogs
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+### ad accounts
+GET {{org_url}}/adaccounts
+
+### Funding Sources
+GET {{org_url}}/fundingsources
+
+### get Campaigns
+GET {{base_url}}/adaccounts/{{ad_account_id}}/campaigns

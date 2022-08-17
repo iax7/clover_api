@@ -2,7 +2,8 @@
 
 @base = https://connect.squareup.com/v2
 @version = 2021-01-21
-@sq_token = ''
+@sq_token = {{$dotenv SQ_TOKEN}}
+@sq_location_id = {{$dotenv SQ_LOCATION_ID}}
 
 # Locations --------------------------------------------------------------------
 ### get

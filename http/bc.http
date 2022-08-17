@@ -1,19 +1,23 @@
 # REF: https://github.com/Huachao/vscode-restclient
 # https://developer.bigcommerce.com/api-reference/store-management/catalog
 
-@base = https://api.bigcommerce.com/stores/{{store_hash}}/v3
-@base2= https://api.bigcommerce.com/stores/{{store_hash}}/v2
+@store_hash = {{$dotenv STORE_HASH}}
+@access_token = {{$dotenv ACCESS_TOKEN}}
+@client_id = {{$dotenv CLIENT_ID}}
+@base = https://api.bigcommerce.com/stores/{{store_hash}}
+@v2 = {{base}}/v2
+@v3 = {{base}}/v3
 
 # Categories -------------------------------------------------------------------
 ### get all
-GET {{base}}/catalog/categories?limit=250
+GET {{v3}}/catalog/categories?limit=250
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
 Accept: application/json
 
 ### create
-POST {{base}}/catalog/categories
+POST {{v3}}/catalog/categories
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -26,7 +30,7 @@ Accept: application/json
 
 # Products ---------------------------------------------------------------------
 ### summary
-GET {{base}}/catalog/summary
+GET {{v3}}/catalog/summary
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -37,7 +41,7 @@ Accept: application/json
 # @name product
 # include *options* only supports limit: 10 per page
 # up limit 250
-GET {{base}}/catalog/products
+GET {{v3}}/catalog/products
     ?include=variants,images
     &include_fields=sku,inventory_level,inventory_tracking
     &sort=name
@@ -48,7 +52,7 @@ Content-Type: application/json
 Accept: application/json
 
 ### create product
-POST {{base}}/catalog/products
+POST {{v3}}/catalog/products
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -82,7 +86,7 @@ Accept: application/json
 
 ### Update Product
 @prd_id = 801
-PUT {{base}}/catalog/products/{{prd_id}}
+PUT {{v3}}/catalog/products/{{prd_id}}
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -100,14 +104,14 @@ Accept: application/json
 
 ### delete (comma separated)
 @ids = 2805
-DELETE {{base}}/catalog/products?id:in={{ids}}
+DELETE {{v3}}/catalog/products?id:in={{ids}}
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
 Accept: application/json
 
 ### Variants for Inventory
-GET {{base}}/catalog/variants
+GET {{v3}}/catalog/variants
     ?limit=250
     &include_fields=id,product_id,sku,inventory_level
 X-Auth-Token: {{access_token}}
@@ -116,7 +120,7 @@ Content-Type: application/json
 Accept: application/json
 
 ### Batch Update Inventory Level
-PUT {{base}}/catalog/variants
+PUT {{v3}}/catalog/variants
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -129,14 +133,14 @@ Accept: application/json
 # Options ----------------------------------------------------------------------
 @prd_id = 11627
 ### get
-GET {{base}}/catalog/products/{{prd_id}}/options
+GET {{v3}}/catalog/products/{{prd_id}}/options
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
 Accept: application/json
 
 ### create
-POST {{base}}/catalog/products/{{prd_id}}/options
+POST {{v3}}/catalog/products/{{prd_id}}/options
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -159,7 +163,7 @@ Accept: application/json
 
 ### change option-value name
 @opt_id = 551
-PUT {{base}}/catalog/products/{{prd_id}}/options/{{opt_id}}/values/1274
+PUT {{v3}}/catalog/products/{{prd_id}}/options/{{opt_id}}/values/1274
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -171,7 +175,7 @@ Accept: application/json
 
 # Images -----------------------------------------------------------------------
 ### set
-POST {{base}}/catalog/products/{{prd_id}}/images
+POST {{v3}}/catalog/products/{{prd_id}}/images
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -183,14 +187,14 @@ Accept: application/json
 
 # Variants (for inventory sync mainly) -----------------------------------------
 ### get all
-GET {{base}}/catalog/variants?limit=250&include_fields=id,product_id,sku,price,image_url,upc,inventory_level,option_values
+GET {{v3}}/catalog/variants?limit=250&include_fields=id,product_id,sku,price,image_url,upc,inventory_level,option_values
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
 Accept: application/json
 
 ### batch update
-PUT {{base}}/catalog/variants
+PUT {{v3}}/catalog/variants
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -201,7 +205,7 @@ Accept: application/json
 ]
 
 ### add a variant
-POST {{base}}/catalog/products/4208/variants
+POST {{v3}}/catalog/products/4208/variants
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -223,14 +227,14 @@ Accept: application/json
 # Channels ---------------------------------------------------------------------
 ### get all
 # @name channel
-GET {{base}}/channels
+GET {{v3}}/channels
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
 Accept: application/json
 
 ### create
-POST {{base}}/channels
+POST {{v3}}/channels
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -255,7 +259,7 @@ Accept: application/json
 
 ### update
 @channel_id = 20771
-PUT {{base}}/channels/{{channel_id}}
+PUT {{v3}}/channels/{{channel_id}}
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -275,17 +279,37 @@ Accept: application/json
 }
 
 ### get listings for channel (from named "channel")
-@id = {{channel.response.body.$.data[?(@.type=="pos" && @.platform=="square")].id}}
-GET {{base}}/channels/{{id}}/listings?limit=500&page=1
+# # {{channel.response.body.$.data[?(@.type=="pos" && @.platform=="square")].id}}
+@id = 764367
+GET {{v3}}/channels/{{id}}/listings?limit=500&page=1
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
 Accept: application/json
 
+### Create a listing
+# https://developer.bigcommerce.com/api-reference/b3A6MzU5MDQ0NTk-create-channel-listings
+POST {{v3}}/channels/{{id}}/listings
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
+
+[
+    {
+        "product_id": 123,
+        "external_id": "ABC",
+        "state": "active",
+        "variants": [
+            { "product_id": 123, "variant_id": 456, "external_id": "CDE", "state": "active" }
+        ]
+    }
+]
+
 # Orders -----------------------------------------------------------------------
 ###
 # @name orders
-GET {{base2}}/orders
+GET {{v2}}/orders
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -293,7 +317,7 @@ Accept: application/json
 
 ### products from order
 @order_id = 100
-GET {{base2}}/orders/{{order_id}}/products
+GET {{v2}}/orders/{{order_id}}/products
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -301,14 +325,14 @@ Accept: application/json
 
 # Webhooks ---------------------------------------------------------------------
 ###
-GET {{base2}}/hooks
+GET {{v2}}/hooks
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
 Accept: application/json
 
 ### create
-POST {{base2}}/hooks
+POST {{v2}}/hooks
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -327,7 +351,7 @@ Accept: application/json
 {"created_at":1617828656,"store_id":"1000776302","producer":"stores/cluiof7n6l","scope":"store/order/statusUpdated","hash":"93316d7802118c1ed0ed1d00cae1a23267fdd5f1","data":{"type":"order","id":102,"status":{"previous_status_id":0,"new_status_id":11}}}
 
 ### update
-PUT {{base2}}/hooks/21592781
+PUT {{v2}}/hooks/21592781
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -342,7 +366,7 @@ Accept: application/json
 }
 
 ### delete
-DELETE {{base2}}/hooks/21592781
+DELETE {{v2}}/hooks/21592781
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -350,7 +374,7 @@ Accept: application/json
 
 # Store -------------------------------------------------------------------
 ### get
-GET {{base2}}/store
+GET {{v2}}/store
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -358,7 +382,7 @@ Accept: application/json
 
 # Currencies -------------------------------------------------------------------
 ### get
-GET {{base2}}/currencies
+GET {{v2}}/currencies
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -366,7 +390,7 @@ Accept: application/json
 
 # Customers --------------------------------------------------------------------
 ### get all
-GET {{base}}/customers
+GET {{v3}}/customers
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -374,7 +398,7 @@ Accept: application/json
 
 # Scripts ----------------------------------------------------------------------
 ### get all
-GET {{base}}/content/scripts
+GET {{v3}}/content/scripts
     ?channel_id=1
     &api_client_id=1
 X-Auth-Token: {{access_token}}
@@ -383,7 +407,7 @@ Content-Type: application/json
 Accept: application/json
 
 ### create
-POST {{base}}/content/scripts
+POST {{v3}}/content/scripts
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
@@ -402,3 +426,11 @@ Accept: application/json
     "consent_category": "analytics",
     "enabled": true
 }
+
+# 3P Auth ----------------------------------------------------------------------
+### get
+GET {{v3}}/partner/credentials/clover
+X-Auth-Token: {{access_token}}
+X-Auth-Client: {{client_id}}
+Content-Type: application/json
+Accept: application/json
