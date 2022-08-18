@@ -17,7 +17,9 @@ Authorization: Bearer {{token}}
 
 # Categories -------------------------------------------------------------------
 ### get all
-GET {{base_url}}/categories?limit=4&offset=8
+GET {{base_url}}/categories
+    ?limit=4
+    &offset=8
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -48,7 +50,8 @@ Authorization: Bearer {{token}}
 }
 
 ### Deleting item associations
-POST {{base_url}}/category_items?delete=true
+POST {{base_url}}/category_items
+     ?delete=true
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -74,7 +77,8 @@ Authorization: Bearer {{token}}
 
 # Attributes  ------------------------------------------------------------------
 ### get all
-GET {{base_url}}/attributes?expand=options
+GET {{base_url}}/attributes
+    ?expand=options,menu_items
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
