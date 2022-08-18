@@ -228,6 +228,9 @@ Accept: application/json
 ### get all
 # @name channel
 GET {{v3}}/channels
+    #?available=true
+    #?type:in=pos
+    ?platform:in=clover
 X-Auth-Token: {{access_token}}
 X-Auth-Client: {{client_id}}
 Content-Type: application/json
