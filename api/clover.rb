@@ -36,6 +36,8 @@ module Api
       end
     end
 
+    # @param name [String]
+    # @return [Hash]
     def category_create(name)
       data = {
         name: name
@@ -43,10 +45,16 @@ module Api
       connection.post("categories", data.to_json)
     end
 
+    # @param id [String]
+    # @return [Hash]
     def category_delete(id)
       connection.delete("categories/#{id}")
     end
 
+    # @param product_id [String]
+    # @param categories_idx [Hash]
+    # @param categories [Hash]
+    # @return [Hash]
     def category_items(product_id, categories_idx, categories)
       elements = []
       categories.each_with_object(elements) do |name, res|
@@ -60,6 +68,8 @@ module Api
       connection.post("category_items", itm_opt.to_json)
     end
 
+    # @param name [String]
+    # @return [Hash]
     def item_group_create(name)
       data = {
         name: name
@@ -67,14 +77,21 @@ module Api
       connection.post("item_groups", data.to_json)
     end
 
+    # @param id [String]
+    # @return [Hash]
     def item_group_delete(id)
       connection.delete("item_groups/#{id}")
     end
 
+    # @param id [String]
+    # @return [Hash]
     def item_delete(id)
       connection.delete("items/#{id}")
     end
 
+    # @param item_group_id [String]
+    # @param name [String]
+    # @return [Hash]
     def attributes_create(item_group_id, name)
       data = {
         name: name,
@@ -85,6 +102,9 @@ module Api
       connection.post("attributes", data.to_json)
     end
 
+    # @param attribute_id [String]
+    # @param name [String]
+    # @return [Hash]
     def options_create(attribute_id, name)
       data = {
         name: name
@@ -92,23 +112,29 @@ module Api
       connection.post("attributes/#{attribute_id}/options", data.to_json)
     end
 
+    # @param item_group_id [String]
+    # @param name [String]
+    # @param sku [String]
+    # @param price [String]
+    # @return [Hash]
     def product_create(item_group_id, name, sku, price)
-      ig = {
-        id: item_group_id
-      }
-      # name, price REQUIRED
-      prd = {
+      data = {
         name: name,
         sku: sku,
-        price: price
+        price: price,
+        menuItem: {
+          name: name,
+          description: "default",
+          enabled: true
+        }
       }
-      prd[:itemGroup] = ig if item_group_id
-      connection.post("items", prd.to_json, { "expand" => "categories,modifierGroups,itemStock,options" })
+      data[:itemGroup] = { id: item_group_id } if item_group_id
+      connection.post("items", data.to_json, { "expand" => "categories,modifierGroups,itemStock,options" })
     end
 
-    # @order id [Hash]
-    # @items [Array]
-    # @shipping [Hash]
+    # @param order id [Hash]
+    # @param items [Array]
+    # @param shipping [Hash]
     # @return [Hash]
     def order_create(order, items, shipping)
       data = {
@@ -122,10 +148,10 @@ module Api
       connection.post("orders", data.to_json)
     end
 
-    # @order [Hash]
-    # @order_type [String]
-    # @items [Array]
-    # @shipping [Hash]
+    # @param order [Hash]
+    # @param order_type [String]
+    # @param items [Array]
+    # @param shipping [Hash]
     # @return [Hash]
     def atomic_order_create(order, items, order_type, shipping)
       data = {
@@ -141,8 +167,8 @@ module Api
       connection.post("atomic_order/orders", data.to_json)
     end
 
-    # @order_id [String]
-    # @line_item_id [String]
+    # @param order_id [String]
+    # @param line_item_id [String]
     # @return [Hash]
     def line_item_create(order_id, line_item_id)
       data = {
@@ -151,9 +177,9 @@ module Api
       connection.post("orders/#{order_id}/line_items", data.to_json)
     end
 
-    # @order_id [String]
-    # @line_item_id [String]
-    # @options [Hash]
+    # @param order_id [String]
+    # @param line_item_id [String]
+    # @param options [Hash]
     # @return [Hash]
     def line_item_update(order_id, line_item_id, options)
       data = {
@@ -162,15 +188,14 @@ module Api
       connection.post("orders/#{order_id}/line_items/#{line_item_id}", data.to_json)
     end
 
-    # @order_id [String]
-    # @line_item_id [String]
+    # @param order_id [String]
     # @return [Hash]
     def order_delete(order_id)
       connection.delete("orders/#{order_id}")
     end
 
-    # @order_id [String]
-    # @line_item_id [String]
+    # @param order_id [String]
+    # @param line_item_id [String]
     # @return [Hash]
     def line_items_delete(order_id, line_item_id: nil)
       # Change url_prefix from the BASE_URLS to ECOMM_URLS of Clover API
@@ -189,7 +214,7 @@ module Api
       end
     end
 
-    # @order [Hash]
+    # @param order [Hash]
     # @return [Array]
     def set_order_items(order)
       item_array = []
@@ -207,32 +232,28 @@ module Api
       item_array
     end
 
-    # @order [Hash]
+    # @param order [Hash]
     # @return [Hash]
     def set_order_shipping(order)
       {
-        city: order["shipping"]["city"],
-        line1: order["shipping"]["line1"],
-        line2: order["shipping"]["line2"],
-        postal_code: order["shipping"]["postal_code"],
-        state: order["shipping"]["state"],
-        country: order["shipping"]["country_iso"],
-        name: order["shipping"]["first_name"],
-        phone: order["shipping"]["phone"]
+        city: order.dig("shipping", "city"),
+        line1: order.dig("shipping", "line1"),
+        line2: order.dig("shipping", "line2"),
+        postal_code: order.dig("shipping", "postal_code"),
+        state: order.dig("shipping", "state"),
+        country: order.dig("shipping", "country_iso"),
+        name: order.dig("shipping", "first_name"),
+        phone: order.dig("shipping", "phone")
       }
     end
 
-    # @order [Hash]
+    # @param order [Hash]
     # @return [Hash]
-    def set_order_type(order)
-      {
-        order_type: order["order_type"]
-      }
-    end
+    def set_order_type(order)= { order_type: order["order_type"] }
 
-    # @order_id [String]
-    # @order [Hash]
-    # @service_charge_id [String]
+    # @param order_id [String]
+    # @param order [Hash]
+    # @param service_charge_id [String]
     # @return [Hash]
     def service_charge_create(order_id, order, service_charge_id)
       data = {
@@ -243,8 +264,8 @@ module Api
       connection.post("orders/#{order_id}/service_charge", data.to_json)
     end
 
-    # @order_id [String]
-    # @order [Hash]
+    # @param order_id [String]
+    # @param order [Hash]
     # @return [Hash]
     def discount_create(order_id, order)
       data = {
@@ -256,6 +277,8 @@ module Api
 
     # Attributes =    Color     Size
     # Options    =  Red White  32   64
+    # @param items [Hash]
+    # @return [Hash]
     def option_item(items)
       elements = []
       create_option = ->(prd, opt) { { option: { id: opt }, item: { id: prd } } }
@@ -272,12 +295,17 @@ module Api
       connection.post("option_items", itm_opt.to_json)
     end
 
+    # @param attributes [Array]
+    # @param options [Array]
+    # @return [Hash]
     def group_attr_opt_ids(attributes, options)
       attr_ids = attributes.each_with_object({}) { |a, res| res[a[:id]] = [] }
       options.each { |o| attr_ids[o.dig(:attribute, :id)] << o[:id] }
       attr_ids
     end
 
+    # @param x [Hash]
+    # @return [Array]
     def attr_opt_combinations(x)
       combinations = []
       keys = x.keys.reverse
@@ -298,12 +326,18 @@ module Api
       combinations
     end
 
+    # @param a [Array]
+    # @param b [Array]
+    # @return [Array]
     def comb(a, b)
       a.each_with_object([]) do |s1, res|
         b.each { |s2| res << [s1, *s2] }
       end
     end
 
+    # @param product_id [String]
+    # @param stock_count [Integer]
+    # @return [Hash]
     def stock_create(product_id, stock_count)
       itm_opt = {
         quantity: stock_count
@@ -311,6 +345,9 @@ module Api
       connection.post("item_stocks/#{product_id}", itm_opt.to_json)
     end
 
+    # @param endpoint [String]
+    # @param additional_params [Hash]
+    # @return [Hash]
     def get_method(endpoint, additional_params = {})
       # Change url_prefix from the BASE_URLS to ECOMM_URLS of Clover API
       connection.url_prefix = base_url(for_orders: false)

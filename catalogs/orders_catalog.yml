@@ -1,7 +1,7 @@
 atomic: true
 orders:
   - order: 1
-    order_type: Online
+    order_type: BigCommerce In-store Pickup
     state: Paid
     shipping:
       city: Calexico
@@ -42,7 +42,7 @@ orders:
         quantity: 1
         type: sku
   - order: 2
-    order_type: Delivery
+    order_type: BigCommerce In-store Pickup
     shipping:
       city: Calexico
       line1: George Avenue
@@ -82,7 +82,7 @@ orders:
         quantity: 1
         type: sku
   - order: 3
-    order_type: Online
+    order_type: BigCommerce In-store Pickup
     shipping:
       city: Calexico
       line1: George Avenue
