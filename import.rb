@@ -4,8 +4,6 @@
 # @see https://docs.clover.com/reference#inventorygetitems-1
 
 require "dotenv/load"
-require "faraday"
-require "json"
 require "pry"
 
 require_relative "api/clover"

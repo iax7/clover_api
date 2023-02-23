@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+require "faraday"
+require "faraday/gzip"
+require "faraday/retry"
+require "json"
+
 module Api
   # Handles all Clover API
   class Clover
@@ -8,7 +13,7 @@ module Api
       prod: "api.clover.com"
     }.freeze
     DEFAULT_QUERY_PARAMS = {
-      limit: 500, # limit cannot be greater than 1000
+      limit: 1000, # limit cannot be greater than 1000
       offset: 0
     }.freeze
 
@@ -32,7 +37,7 @@ module Api
         faraday.request :authorization, "Bearer", token
         faraday.request :json
         faraday.response :json, parser_options: { symbolize_names: true }
-        faraday.adapter Faraday.default_adapter
+        faraday.adapter :net_http
       end
     end
 

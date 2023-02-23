@@ -29,5 +29,5 @@ Configure http client in VS Code:
 }
 ```
 
-[ruby-badge]: https://img.shields.io/badge/ruby-3.0.3-blue?style=flat&logo=ruby&logoColor=CC342D&labelColor=white
+[ruby-badge]: https://img.shields.io/badge/ruby-3.2.1-blue?style=flat&logo=ruby&logoColor=CC342D&labelColor=white
 [ruby-url]: https://www.ruby-lang.org/en/

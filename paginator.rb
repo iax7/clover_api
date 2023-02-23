@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
+require "dotenv/load"
 require "faraday"
 require "pry"
-require "dotenv/load"
 
 merchant_id = ENV["CL_MERCHANT_ID"]
 token = ENV["CL_TOKEN"]
@@ -9,7 +11,7 @@ connection = Faraday.new(url: url) do |faraday|
   faraday.request :authorization, "Bearer", token
   faraday.request :json
   faraday.response :json, parser_options: { symbolize_names: true }
-  faraday.adapter Faraday.default_adapter
+  faraday.adapter :net_http
 end
 
 params = {

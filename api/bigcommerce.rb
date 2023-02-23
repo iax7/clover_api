@@ -1,5 +1,10 @@
 # frozen_string_literal: true
 
+require "faraday"
+require "faraday/gzip"
+require "faraday/retry"
+require "json"
+
 module Api
   # Handles all Bigcommerce API
   class Bigcommerce
@@ -19,8 +24,8 @@ module Api
         faraday.headers = headers(token)
         faraday.request :json
         faraday.response :json, parser_options: { symbolize_names: true }
-        faraday.use FaradayMiddleware::Gzip
-        faraday.adapter Faraday.default_adapter
+        faraday.request :gzip
+        faraday.adapter :net_http
       end
     end
 

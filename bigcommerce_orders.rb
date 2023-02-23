@@ -3,9 +3,8 @@
 
 require "yaml"
 require "dotenv/load"
-require "faraday"
-require "json"
 require "pry"
+
 require_relative "api/bigcommerce"
 require_relative "helpers/helper"
 

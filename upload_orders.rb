@@ -3,10 +3,8 @@
 
 require "yaml"
 require "dotenv/load"
-require "faraday"
-require "faraday_middleware"
-require "json"
 require "pry"
+
 require_relative "api/clover"
 require_relative "helpers/helper"
 
